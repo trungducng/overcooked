@@ -40,3 +40,7 @@ Kitchen Rush hiện có các công đoạn nấu, cháy món, rửa đĩa, combo
 - Biểu tượng nguyên liệu gắn lên mặt thùng, không phủ nhãn chữ lên mọi vật.
 - Chỉ hiện tên quầy đang tương tác; tiến độ và cảnh báo hoạt động hiển thị ngắn gọn.
 - Phím H hoặc nút “Nhãn gọn” bật lại đầy đủ tên khi cần học căn bếp.
+
+## Thay thế cấu trúc thi đấu — 16/10/2026
+
+Theo yêu cầu mới, hai bếp độc lập mô tả ở phần lịch sử phía trên đã được thay bằng một bếp chung, một camera, cùng thớt/nồi/chảo/đĩa/bàn ráp và bàn trống. PvP/bot giữ đơn và điểm riêng; người giao nhận điểm. Xem [lộ trình tuần tự và cổng nghiệm thu](implementation-plan.md) để theo dõi phần còn thiếu. Chưa có dữ liệu khẳng định toàn bộ game đạt 90% tham chiếu.

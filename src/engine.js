@@ -11,10 +11,18 @@ export class KitchenGame{
  reset(){this.status='ready';this.time=this.config.duration;this.score=0;this.served=0;this.missed=0;this.combo=0;this.sequence=0;this.dirty=0;this.plates=4;this.wash=0;this.assembly=null;this.grill={item:null,time:0,ready:false,burnt:false,fireWork:0};this.rush=false;this.board=null;this.pot={ingredients:[],time:0,ready:false,burnt:false,fireWork:0};this.counters={};this.orders=[];this.events=[];for(let i=0;i<3;i++)this.newOrder()}
  emit(type,text,extra={}){this.events.push({type,text,...extra})}
  newOrder(){const menu=this.config.menu;const recipe=RECIPES.find(r=>r.id===menu[(this.sequence+this.config.recipeOffset)%menu.length]);this.orders.push({id:++this.sequence,recipe:recipe.id,time:this.config.patience,total:this.config.patience})}
+ attachKitchen(kitchen){
+  // Preparation and dishes are physical shared resources; orders and scores stay per team.
+  for(const key of ['board','pot','grill','assembly','plates','dirty','wash','counters']){
+   Object.defineProperty(this,key,{configurable:true,enumerable:true,get:()=>kitchen[key],set:value=>{kitchen[key]=value}});
+  }
+ }
  start(){this.status='playing'}
- tick(dt){if(this.status!=='playing')return;this.time=Math.max(0,this.time-dt);const elapsed=this.config.duration-this.time;const rush=elapsed>=45&&elapsed%45<12;if(rush&&!this.rush)this.emit('rush','Giờ cao điểm! Giao món nhận thêm 25% điểm trong 12 giây.');this.rush=rush;for(const o of [...this.orders]){o.time-=dt;if(o.time<=0){this.orders=this.orders.filter(n=>n!==o);this.score=Math.max(0,this.score-20);this.missed++;this.combo=0;this.emit('miss','Khách đã rời đi · −20đ');this.newOrder()}}
+ tick(dt,advanceKitchen=true){if(this.status!=='playing')return;this.time=Math.max(0,this.time-dt);const elapsed=this.config.duration-this.time;const rush=elapsed>=45&&elapsed%45<12;if(rush&&!this.rush)this.emit('rush','Giờ cao điểm! Giao món nhận thêm 25% điểm trong 12 giây.');this.rush=rush;for(const o of [...this.orders]){o.time-=dt;if(o.time<=0){this.orders=this.orders.filter(n=>n!==o);this.score=Math.max(0,this.score-20);this.missed++;this.combo=0;this.emit('miss','Khách đã rời đi · −20đ');this.newOrder()}}
+ if(advanceKitchen){
  const pot=this.pot;if(pot.ingredients.length===2&&!pot.burnt){pot.time+=dt;if(pot.time>=this.config.cookTime&&!pot.ready){pot.ready=true;this.emit('ready','Súp chín rồi! Mang đĩa đến nồi.')}if(pot.time>=this.config.cookTime+this.config.burnAfter){pot.burnt=true;pot.ready=false;this.emit('fire','Nồi cháy! Đến gần và giữ Space để dập lửa.')}}
  const grill=this.grill;if(grill.item&&!grill.burnt){grill.time+=dt;if(grill.time>=7&&!grill.ready){grill.ready=true;this.emit('ready','Thịt nướng chín! Lấy ra trước khi cháy.')}if(grill.time>=25){grill.burnt=true;grill.ready=false;this.emit('fire','Chảo cháy! Tay không, giữ Space để dập lửa.')}}
+ }
  if(this.time===0){this.status='ended';this.emit('end','Hết ca làm!')}}
  action(p,s){if(this.status!=='playing'||!s)return false;if(s.team!==undefined&&s.team!==(p.team??0))return this.fail('Đây là căn bếp của đối thủ.');const item=p.item;
  if(s.kind==='source'){if(!item){p.item={kind:'raw',ingredient:s.ingredient};return true}return this.fail('Tay đang bận! Đặt đồ lên bàn trống trước nhé.')}
@@ -34,7 +42,7 @@ export class KitchenGame{
  }
  if(s.kind==='plates'){if(item)return this.fail('Đặt đồ đang cầm xuống trước.');if(!this.plates)return this.fail('Hết đĩa sạch! Giữ Space ở bồn rửa.');this.plates--;p.item={kind:'plate'};return true}
  if(s.kind==='sink'){if(item?.kind==='plate'){this.plates++;p.item=null;return true}return this.fail(this.dirty?'Tay không, giữ Space để rửa đĩa.':'Chưa có đĩa bẩn. Đĩa sẽ về sau mỗi món phục vụ.')}
- if(s.kind==='serve'){if(item?.kind!=='meal')return this.fail('Chỉ giao món súp đã múc ra đĩa.');const order=this.orders.find(o=>o.recipe===item.recipe);if(!order)return this.fail('Chưa có khách gọi món này!');const recipe=RECIPES.find(r=>r.id===item.recipe);const tip=Math.ceil(order.time/10)*2;this.combo=order===this.orders[0]?this.combo+1:0;const multiplier=1+Math.min(this.combo,5)*.2;const points=Math.round((recipe.value+tip)*multiplier*(this.rush?1.25:1));this.score+=points;this.served++;this.dirty++;p.item=null;this.orders=this.orders.filter(o=>o!==order);this.newOrder();this.emit('serve',`+${points}đ · Ngon tuyệt!`,{points,combo:this.combo});return true}
+ if(s.kind==='serve'){if(item?.kind!=='meal')return this.fail('Chỉ giao món đã hoàn thiện trên đĩa.');const order=this.orders.find(o=>o.recipe===item.recipe);if(!order)return this.fail('Chưa có khách gọi món này!');const recipe=RECIPES.find(r=>r.id===item.recipe);const tip=Math.ceil(order.time/10)*2;this.combo=order===this.orders[0]?this.combo+1:0;const multiplier=1+Math.min(this.combo,5)*.2;const points=Math.round((recipe.value+tip)*multiplier*(this.rush?1.25:1));this.score+=points;this.served++;this.dirty++;p.item=null;this.orders=this.orders.filter(o=>o!==order);this.newOrder();this.emit('serve',`+${points}đ · Ngon tuyệt!`,{points,combo:this.combo});return true}
  if(s.kind==='trash'){if(!item)return this.fail('Thùng rác đang chờ đồ thừa.');if(item.kind==='plate'||item.kind==='meal')this.dirty++;p.item=null;this.emit('trash','Đã bỏ đồ đang cầm.');return true}
  if(s.kind==='counter'){if(!item&&this.counters[s.id]){p.item=this.counters[s.id];delete this.counters[s.id];return true}if(item&&!this.counters[s.id]){this.counters[s.id]=item;p.item=null;return true}return this.fail(item?'Mặt bàn đã có đồ.':'Mặt bàn trống — có thể đặt đồ ở đây.')}
  return false}

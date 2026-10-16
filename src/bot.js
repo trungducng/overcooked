@@ -1,4 +1,4 @@
-import { RECIPES, INGREDIENTS, matchAssembly } from './engine.js';
+import { RECIPES, INGREDIENTS, matchAssembly, matchRecipe } from './engine.js';
 import { createNavigator, nearestStation, collides, speedMultiplier } from './navigation.js';
 export const BOT_DIFFICULTIES={easy:{name:'Tập sự',speed:2.7,delay:.4},normal:{name:'Đầu bếp',speed:3.2,delay:.18},hard:{name:'Bếp trưởng',speed:3.8,delay:.04}};
 export class ChefBot{
@@ -6,18 +6,33 @@ export class ChefBot{
   choose(game,p){
     const own=kind=>this.stations.find(s=>s.kind===kind&&(s.team===undefined||s.team===(p.team??0)));
     const task=(kind,work=false,label='')=>({station:own(kind),work,label});
+    const candidates=game.orders.map(o=>RECIPES.find(r=>r.id===o.recipe));
+    const contains=(recipe,items)=>items.every((item,i)=>items.slice(0,i+1).filter(x=>x===item).length<=recipe.ingredients.filter(x=>x===item).length);
+    const matching=(predicate)=>candidates.find(predicate)||RECIPES.find(predicate);
     if(this.lastServed!==game.served){this.recipe=null;this.lastServed=game.served;}
-    if(!this.recipe)this.recipe=RECIPES.find(r=>r.id===game.orders[0].recipe);
+    if(!p.item){
+      if(game.board){const ingredient=game.board.ingredient,assemblyKeys=game.assembly?.components.map(c=>c.kind+':'+c.ingredient)||[],assemblyRecipe=game.assembly&&matching(r=>r.components&&r.components.includes('chopped:'+ingredient)&&!assemblyKeys.includes('chopped:'+ingredient)&&assemblyKeys.every(k=>r.components.includes(k)));this.recipe=ingredient==='beef'?RECIPES.find(r=>r.id==='burger'):ingredient==='lettuce'?RECIPES.find(r=>r.id==='salad'):
+        assemblyRecipe||matching(r=>r.family==='soup'&&contains(r,[...game.pot.ingredients,ingredient]))||matching(r=>r.ingredients.includes(ingredient));}
+      else if(game.pot.ingredients.length)this.recipe=matchRecipe(game.pot.ingredients)||matching(r=>r.family==='soup'&&contains(r,game.pot.ingredients));
+      else if(game.assembly){const keys=game.assembly.components.map(c=>c.kind+':'+c.ingredient);this.recipe=matching(r=>r.components&&keys.every(k=>r.components.includes(k)));}
+      else if(game.grill.item)this.recipe=RECIPES.find(r=>r.id==='burger');
+    }
+    if(!this.recipe)this.recipe=candidates[0];
+    const park=()=>({station:this.stations.find(s=>s.kind==='counter'&&!game.counters[s.id])||own('trash'),label:'Đặt đồ tạm để nhường quầy'});
+    const source=ingredient=>({station:this.stations.find(s=>s.kind==='counter'&&game.counters[s.id]?.ingredient===ingredient)||this.stations.find(s=>s.ingredient===ingredient),label:`Lấy ${INGREDIENTS[ingredient].name.toLowerCase()}`});
     for(const kind of ['pot','grill'])if(game[kind].burnt){if(p.item)return task(p.item.kind==='plate'?'sink':'trash',false,'Dọn tay để dập lửa');return task(kind,true,'Dập lửa');}
     if(p.item?.kind==='meal')return task(game.orders.some(o=>o.recipe===p.item.recipe)?'serve':'trash',false,'Giao món');
+    if(p.item?.kind==='plate'&&this.recipe.family!=='soup'&&game.assembly)return p.item.components?.length?park():task('sink',false,'Trả đĩa để tiếp tục món đang ráp');
     if(p.item?.kind==='plate')return task(this.recipe.family==='soup'?'pot':'assembly',false,this.recipe.family==='soup'?'Múc súp':'Đặt đĩa lên bàn ráp');
-    if(p.item?.kind==='cooked'||p.item?.ingredient==='bun')return task('assembly',false,'Ráp món');
+    if(p.item?.kind==='cooked'||p.item?.ingredient==='bun')return game.assembly?task('assembly',false,'Ráp món'):park();
+    if(p.item?.kind==='chopped'&&(p.item.ingredient==='beef'&&game.grill.item||p.item.ingredient!=='beef'&&this.recipe.family!=='soup'&&!game.assembly))return park();
     if(p.item?.kind==='chopped')return task(p.item.ingredient==='beef'?'grill':this.recipe.family==='soup'?'pot':'assembly',false,'Thêm nguyên liệu');
+    if(p.item?.kind==='raw'&&game.board)return park();
     if(p.item?.kind==='raw')return task('board',false,'Đặt lên thớt');
     if(game.board)return task('board',game.board.progress<1,game.board.progress<1?'Đang thái':'Lấy nguyên liệu');
     if(this.recipe.family==='soup'){
       if(game.pot.ready||game.pot.ingredients.length===2)return task(game.plates?'plates':'sink',!game.plates,game.plates?'Lấy đĩa':'Rửa đĩa');
-      const ingredient=this.recipe.ingredients[game.pot.ingredients.length];return {station:this.stations.find(s=>s.ingredient===ingredient),label:`Lấy ${INGREDIENTS[ingredient].name.toLowerCase()}`};
+      const ingredients=[...this.recipe.ingredients];for(const ingredient of game.pot.ingredients)ingredients.splice(ingredients.indexOf(ingredient),1);return source(ingredients[0]);
     }
     if(!game.assembly)return task(game.plates?'plates':'sink',!game.plates,game.plates?'Lấy đĩa ráp món':'Rửa đĩa');
     if(matchAssembly(game.assembly.components))return task('assembly',false,'Lấy món đã ráp');
@@ -26,7 +41,7 @@ export class ChefBot{
     const missing=this.recipe.components.filter(c=>!present.includes(c));
     const next=missing.find(c=>c!=='cooked:beef'||!game.grill.item);
     if(!next)return task('grill',false,'Chờ thịt nướng');
-    const ingredient=next.split(':')[1];return{station:this.stations.find(s=>s.ingredient===ingredient),label:`Lấy ${INGREDIENTS[ingredient].name.toLowerCase()}`};
+    const ingredient=next.split(':')[1];return source(ingredient);
   }
   update(game,p,dt){
     p.moving=false;p.work=false;if(game.status!=='playing')return;

@@ -10,13 +10,15 @@ export class KitchenMatch {
     this.competitive=isVersus(this.options.mode);this.stations=getStations(this.map.id,this.competitive);
     const config={...this.level,recipeOffset:this.level.recipeOffset+MAPS.indexOf(this.map)};
     this.games=Array.from({length:this.competitive?2:1},()=>new KitchenGame(config));
+    this.kitchen=Object.fromEntries(['board','pot','grill','assembly','plates','dirty','wash','counters'].map(key=>[key,this.games[0][key]]));
+    for(const game of this.games)game.attachKitchen(this.kitchen);
     this.bot=this.options.mode==='bot'?new ChefBot(stationsForTeam(this.stations,1),this.map,this.options.difficulty):null;
   }
   get status(){return this.games[0].status}
   set status(value){for(const game of this.games)game.status=value}
   get time(){return this.games[0].time}
   start(){this.status='playing'}
-  tick(dt,players){if(this.status!=='playing')return;for(const game of this.games)game.tick(dt);if(this.bot&&players&&this.status==='playing')this.bot.update(this.games[1],players[1],dt);}
+  tick(dt,players){if(this.status!=='playing')return;for(let i=0;i<this.games.length;i++)this.games[i].tick(dt,i===0);if(this.bot&&players&&this.status==='playing')this.bot.update(this.games[1],players[1],dt);}
   gameFor(index){return this.games[this.competitive?index:0]}
   get result(){if(!this.competitive)return null;const [a,b]=this.games;return{winner:a.score===b.score?null:a.score>b.score?0:1,scores:[a.score,b.score],served:[a.served,b.served]}}
 }

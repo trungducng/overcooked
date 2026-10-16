@@ -11,18 +11,18 @@ npm test
 npm run build
 ```
 
-Vite in URL bản chơi; `dist/` là bản build tĩnh. Các kiểm tra bao gồm vòng nấu–giao–rửa, cháy nồi, quyền sử dụng quầy theo đội, tìm đường trên mọi map, cả chín level, bot ở ba trình độ, tạm dừng và kết quả trận.
+Vite in URL bản chơi; `dist/` là bản build tĩnh. Các kiểm tra bao gồm vòng nấu–giao–rửa, cháy nồi, chuyển đồ giữa hai đầu bếp và tài nguyên dùng chung, tìm đường trên mọi map, cả chín level, bot ở ba trình độ, tạm dừng và kết quả trận.
 
 ## Bốn chế độ
 
 - **Một mình:** săn ba sao trên từng màn.
 - **Đồng đội:** hai người dùng chung thớt, nồi, đơn hàng, đĩa và điểm.
-- **Đấu tay đôi (PvP):** hai người cùng máy, cùng bàn phím. Mỗi bên có một căn bếp đầy đủ, tách biệt, camera riêng.
-- **Đấu với bot:** bot dùng quầy xanh và tự tìm đường, lấy nguyên liệu, thái, nấu, lấy đĩa, giao món, rửa đĩa và dập lửa. Có Tập sự, Đầu bếp và Bếp trưởng; khác tốc độ đi và thời gian phản ứng, cùng luật nấu/điểm với người.
+- **Đấu tay đôi (PvP):** hai người cùng máy, cùng bàn phím. Hai người đi lại trong cùng một căn bếp và tranh điểm giao món.
+- **Đấu với bot:** bot dùng chung quầy với người chơi và tự tìm đường, lấy nguyên liệu, thái, nấu, lấy đĩa, giao món, rửa đĩa và dập lửa. Có Tập sự, Đầu bếp và Bếp trưởng; khác tốc độ đi và thời gian phản ứng, cùng luật nấu/điểm với người.
 
-PvP và đấu bot dùng cùng thời gian trận và cùng chuỗi công thức. Mỗi bên có điểm, combo, đơn đang chờ, nồi, thớt và số đĩa riêng. Bỏ lỡ đơn bị trừ 20đ; điểm không xuống dưới 0. Điểm cao hơn khi hết giờ thắng; bằng điểm là hòa. Kho nguyên liệu, bàn trống, chảo, bàn ráp, đĩa và bồn rửa đều tách riêng giữa hai bếp. Hai nút ở danh sách đơn cho phép xem đơn từng bên. Chưa có chơi mạng giữa các máy.
+PvP và đấu bot dùng cùng thời gian trận và cùng chuỗi công thức. Mỗi bên có điểm, combo và đơn đang chờ riêng; nồi, thớt, chảo, bàn ráp, đĩa, bồn rửa và bàn trống dùng chung. Bỏ lỡ đơn bị trừ 20đ; điểm không xuống dưới 0. Điểm cao hơn khi hết giờ thắng; bằng điểm là hòa. Ai hoàn tất và giao món thì bên đó nhận điểm. Hai nút ở danh sách đơn cho phép xem đơn từng bên. Chưa có chơi mạng giữa các máy.
 
-## Ba bản đồ, chín màn
+## Ba bản đồ, chín cấu hình màn
 
 1. **Căn bếp ban mai:** đảo bếp dài, đi vòng hai bên.
 2. **Bến cảng gió lộng:** hai đảo tách rời, lối giữa có vũng nước làm chậm bước chân (cả người lẫn bot).
@@ -57,7 +57,7 @@ Sáu công thức thuộc ba quy trình:
 
 Có nút **Công thức** để xem sổ tay, và đường chế biến hiện trên mỗi đơn. Level trộn các loại món để người chơi phân công và làm song song. Giao đơn đầu danh sách tăng combo 20% mỗi bước, tối đa ×2; giao sai thứ tự hoặc bỏ lỡ đơn mất chuỗi. Cứ mỗi 45 giây có cao điểm 12 giây, thêm 25% điểm phục vụ.
 
-Sàn mở rộng 25% theo chiều ngang và 40% theo chiều sâu (diện tích tăng 75%). Thi đấu dùng hai bếp độc lập với cùng bố trí và thời gian; trên desktop hai bếp cạnh nhau, màn hình nhỏ xếp dọc. [Nghiên cứu thiết kế](docs/design-research.md) ghi rõ nguồn tham khảo và phạm vi đã làm.
+Sàn mở rộng 25% theo chiều ngang và 40% theo chiều sâu (diện tích tăng 75%). Mọi chế độ dùng một căn bếp với một camera. [Nghiên cứu thiết kế](docs/design-research.md) ghi rõ nguồn tham khảo và phạm vi đã làm.
 
 ## Mã nguồn
 
@@ -71,3 +71,7 @@ Sàn mở rộng 25% theo chiều ngang và 40% theo chiều sâu (diện tích 
 ### Nhìn căn bếp dễ hơn
 
 Nhãn chữ mặc định chỉ hiện tại quầy đang tương tác. Biểu tượng nằm trực tiếp trên thùng nguyên liệu; nồi/chảo đang nấu, món chín hoặc cháy có chỉ báo ngắn. Nhấn **H** hoặc nút **Nhãn gọn** để bật/tắt toàn bộ tên quầy.
+
+## Lộ trình tiếp theo
+
+Xem [kế hoạch triển khai tuần tự](docs/implementation-plan.md). Mỗi mốc phải vượt cổng nghiệm thu 90% trước khi sang mốc tiếp; chưa công bố toàn game đạt 90% Overcooked! 2.
