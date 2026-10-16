@@ -67,3 +67,7 @@ Sàn mở rộng 25% theo chiều ngang và 40% theo chiều sâu (diện tích 
 - `src/navigation.js`: va chạm, ảnh hưởng địa hình và đường đi A*.
 - `src/bot.js`: bot thực hiện thao tác thật qua engine, không tạo điểm giả.
 - `src/main.js`: hình ảnh 3D, giao diện, bàn phím và menu.
+
+### Nhìn căn bếp dễ hơn
+
+Nhãn chữ mặc định chỉ hiện tại quầy đang tương tác. Biểu tượng nằm trực tiếp trên thùng nguyên liệu; nồi/chảo đang nấu, món chín hoặc cháy có chỉ báo ngắn. Nhấn **H** hoặc nút **Nhãn gọn** để bật/tắt toàn bộ tên quầy.

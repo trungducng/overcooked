@@ -7,9 +7,9 @@ export const MODES = {
   bot: { name: 'Đấu với bot', icon: '✦', description: 'Bếp của bạn đấu bếp AI. Đủ nguyên liệu và dụng cụ riêng.' },
 };
 export const MAPS = [
-  { id: 'sunny', name: 'Căn bếp ban mai', short: 'SUNNY SIDE', icon: '☀', subtitle: 'Vườn nhỏ, lối đi vòng quanh đảo bếp.', background: '#e5e9d6', floor: [0xe9ead9, 0x9eb7a6], wall: 0xf1dbae, cabinet: 0x789a83, accent: '#789a83', hazard: [], spawn: [{x:0,z:1.6},{x:-3,z:1.6}] },
-  { id: 'harbor', name: 'Bến cảng gió lộng', short: 'HARBOR KITCHEN', icon: '⚓', subtitle: 'Lối giữa thông thoáng. Cẩn thận sàn ướt!', background: '#d7e5e5', floor: [0xeee6d4, 0x8baebc], wall: 0xc8dfdf, cabinet: 0x678ca4, accent: '#678ca4', hazard: [{x:0,z:0,rx:.85,rz:1.1}], spawn: [{x:0,z:1.5},{x:-3.8,z:1.5}] },
-  { id: 'market', name: 'Chợ đêm đèn lồng', short: 'LANTERN MARKET', icon: '☾', subtitle: 'Bếp đổi phía, đảo lệch và lối đi zích zắc.', background: '#dcd8e5', floor: [0xf0ddbd, 0xbb9d9d], wall: 0xd8bfba, cabinet: 0x9e737d, accent: '#9e737d', hazard: [], spawn: [{x:0,z:-1.6},{x:3.8,z:1.5}] },
+  { id: 'sunny', name: 'Căn bếp ban mai', short: 'SUNNY SIDE', icon: '☀', subtitle: 'Vườn nhỏ, lối đi vòng quanh đảo bếp.', background: '#dce4d5', floor: [0xeee2c5, 0x709c8c], wall: 0xe8c184, cabinet: 0x28745d, accent: '#789a83', hazard: [], spawn: [{x:0,z:1.6},{x:-3,z:1.6}] },
+  { id: 'harbor', name: 'Bến cảng gió lộng', short: 'HARBOR KITCHEN', icon: '⚓', subtitle: 'Lối giữa thông thoáng. Cẩn thận sàn ướt!', background: '#cbdfe2', floor: [0xede3c9, 0x679bab], wall: 0xb3cfd1, cabinet: 0x306f94, accent: '#678ca4', hazard: [{x:0,z:0,rx:.85,rz:1.1}], spawn: [{x:0,z:1.5},{x:-3.8,z:1.5}] },
+  { id: 'market', name: 'Chợ đêm đèn lồng', short: 'LANTERN MARKET', icon: '☾', subtitle: 'Bếp đổi phía, đảo lệch và lối đi zích zắc.', background: '#cec1d0', floor: [0xefdbb4, 0xa66d78], wall: 0xd39e88, cabinet: 0x93475d, accent: '#9e737d', hazard: [], spawn: [{x:0,z:-1.6},{x:3.8,z:1.5}] },
 ];
 export const ROOM_SCALE={x:1.25,z:1.4};
 for(const map of MAPS){for(const p of map.spawn){p.x*=ROOM_SCALE.x;p.z*=ROOM_SCALE.z}for(const h of map.hazard){h.x*=ROOM_SCALE.x;h.z*=ROOM_SCALE.z;h.rx*=ROOM_SCALE.x;h.rz*=ROOM_SCALE.z}}

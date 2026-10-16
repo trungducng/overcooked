@@ -10,12 +10,13 @@ const gameFor=i=>match.gameFor(i);
 const scene=new THREE.Scene();scene.background=new THREE.Color('#e5e9d6');scene.fog=new THREE.Fog('#e5e9d6',32,65);
 const camera=new THREE.OrthographicCamera(-12,12,10,-10,.1,100);camera.position.set(10.5,18,18);camera.lookAt(0,0,0);
 let renderer;try{renderer=new THREE.WebGLRenderer({antialias:true,alpha:false,powerPreference:'high-performance'});}catch(e){$('#start-card').innerHTML='<h2>Cần WebGL để chơi</h2><p>Hãy mở game trong Chrome, Edge hoặc Safari và bật tăng tốc phần cứng.</p>';throw e}
-renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;wrap.prepend(renderer.domElement);
-scene.add(new THREE.HemisphereLight(0xfff8df,0x72866b,2));const sun=new THREE.DirectionalLight(0xffedd0,3.2);sun.position.set(-6,13,8);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-14,right:14,top:12,bottom:-12,near:1,far:38});sun.shadow.normalBias=.035;sun.shadow.bias=-.00015;sun.shadow.radius=4;scene.add(sun);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.96;wrap.prepend(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0xfff8df,0x5a746b,1.15));const sun=new THREE.DirectionalLight(0xffe5bd,2.7);sun.position.set(-6,13,8);sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-14,right:14,top:12,bottom:-12,near:1,far:38});sun.shadow.normalBias=.035;sun.shadow.bias=-.00015;sun.shadow.radius=2.5;scene.add(sun);
 const rivalScene=new THREE.Scene();rivalScene.background=scene.background.clone();rivalScene.fog=scene.fog.clone();
-const fill=new THREE.DirectionalLight(0xd0e8e4,1);fill.position.set(8,6,-8);scene.add(fill);for(const light of scene.children.filter(o=>o.isLight))rivalScene.add(light.clone());
+const fill=new THREE.DirectionalLight(0xd0e8e4,.6);fill.position.set(8,6,-8);scene.add(fill);for(const light of scene.children.filter(o=>o.isLight))rivalScene.add(light.clone());
 const roomScene=team=>versus&&team===1?rivalScene:scene;
-const mats=new Map();function mat(color,roughness=.75,metalness=0){const key=`${color}:${roughness}:${metalness}`;if(!mats.has(key))mats.set(key,new THREE.MeshStandardMaterial({color,roughness,metalness}));return mats.get(key)}
+const colorAccents=new Map([[0xf2dfb5,0xefd19a],[0xd4bf94,0xbca16a],[0xb4c1a2,0x83a28c],[0xcdbf9e,0xb7a17d],[0xe75f40,0xe7492b],[0xeaa05e,0xef873b],[0x72a3bd,0x3f94c4],[0x7f9c62,0x5f924c],[0x829c64,0x689650],[0xa0b47b,0x83aa5b]]);
+const mats=new Map();function mat(color,roughness=.75,metalness=0){const key=`${color}:${roughness}:${metalness}`;if(!mats.has(key))mats.set(key,new THREE.MeshStandardMaterial({color:colorAccents.get(color)??color,roughness,metalness}));return mats.get(key)}
 function box(w,h,d,color,x=0,y=0,z=0,parent=scene){const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;parent.add(mesh);return mesh}
 function sphere(r,color,x=0,y=0,z=0,parent=scene,scale){const m=new THREE.Mesh(new THREE.SphereGeometry(r,16,12),mat(color));m.position.set(x,y,z);if(scale)m.scale.set(...scale);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
 function cyl(rt,rb,h,color,x=0,y=0,z=0,parent=scene,n=24){const m=new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,n),mat(color));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;parent.add(m);return m}
@@ -70,7 +71,16 @@ function applyTheme(){
 }
 function colorLantern(x,y,z,color){cyl(.025,.025,.28,0x7e6758,x,y+.4,z,mapDecor);sphere(.32,color,x,y,z,mapDecor,[1,1.25,1]);for(const dy of [-.35,.35])cyl(.15,.15,.06,0xae7d54,x,y+dy,z,mapDecor);cyl(.02,.02,.2,0xd9a352,x,y-.48,z,mapDecor);}
 function stationCounter(s){const group=new THREE.Group();group.position.set(s.x,0,s.z);roomScene(s.team).add(group);const isIsland=s.kind==='counter';box(2.08,.88,1.28,isIsland?0xc79461:activeMap.cabinet,0,.65,0,group);box(2.16,.18,1.42,0xf2dfb5,0,1.19,0,group);box(2.05,.12,1.27,0xd4bf94,0,.25,0,group);for(const x of [-.57,.57])box(.1,.24,.9,0x9c8863,x,.13,0,group);
-if(s.kind!=='sink'&&s.kind!=='pot'){box(.91,.55,.035,isIsland?0xd8ab7d:0x90ae95,-.49,.7,.658,group);box(.91,.55,.035,isIsland?0xd8ab7d:0x90ae95,.49,.7,.658,group);box(.2,.045,.07,0xd9c691,-.49,.84,.7,group);box(.2,.045,.07,0xd9c691,.49,.84,.7,group)}if(s.team!==undefined){box(1.98,.11,.07,s.team===0?0xeaa05e:0x72a3bd,0,1.09,.735,group)}return group}
+if(s.kind!=='sink'&&s.kind!=='pot'){box(.91,.55,.035,isIsland?0xc99960:new THREE.Color(activeMap.cabinet).lerp(new THREE.Color(0xffffff),.12).getHex(),-.49,.7,.658,group);box(.91,.55,.035,isIsland?0xc99960:new THREE.Color(activeMap.cabinet).lerp(new THREE.Color(0xffffff),.12).getHex(),.49,.7,.658,group);box(.2,.045,.07,0xd9c691,-.49,.84,.7,group);box(.2,.045,.07,0xd9c691,.49,.84,.7,group)}if(s.team!==undefined){box(1.98,.11,.07,s.team===0?0xeaa05e:0x72a3bd,0,1.09,.735,group)}return group}
+const binIconMaterials=new Map();
+function binIcon(ingredient,parent){
+ if(!binIconMaterials.has(ingredient)){
+  const canvas=document.createElement('canvas');canvas.width=256;canvas.height=256;const ctx=canvas.getContext('2d');
+  ctx.fillStyle='#fff4d4';ctx.strokeStyle='#836d47';ctx.lineWidth=9;ctx.beginPath();ctx.roundRect(8,8,240,240,38);ctx.fill();ctx.stroke();ctx.font='156px "Apple Color Emoji", "Segoe UI Emoji", sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(INGREDIENTS[ingredient].emoji,128,139);
+  const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;binIconMaterials.set(ingredient,new THREE.MeshBasicMaterial({map:texture,toneMapped:false}));
+ }
+ const icon=new THREE.Mesh(new THREE.PlaneGeometry(.51,.46),binIconMaterials.get(ingredient));icon.position.set(0,.68,.736);parent.add(icon);
+}
 const stationGroups={},dynamicGroups={},potVisuals=[];
 function buildStations(){
 for(const group of Object.values(stationGroups)){group.parent?.remove(group);disposeTree(group)}
@@ -80,7 +90,7 @@ potVisuals.length=0;
 
 for(const s of stations){if(s.kind==='trash'){const g=new THREE.Group();g.position.set(s.x,0,s.z);roomScene(s.team).add(g);box(.8,.85,.8,0x7d8c77,0,.56,0,g);box(.9,.12,.9,0xb3b7a0,0,1.04,0,g);box(.45,.025,.38,0x455d4f,0,1.115,0,g);for(const x of [-.27,.27])cyl(.09,.09,.18,0x3e5145,x,.15,0,g);stationGroups[s.id]=g;continue}
 const g=stationCounter(s);stationGroups[s.id]=g;const dyn=new THREE.Group();dyn.position.y=1.31;g.add(dyn);dynamicGroups[s.id]=dyn;
-if(s.kind==='source'){box(1.65,.14,1.05,0xb68a55,0,1.36,0,g);for(const z of [-.48,.48])box(1.65,.24,.09,0xcaa26a,0,1.51,z,g);for(const x of [-.81,.81])box(.09,.24,1.05,0xcaa26a,x,1.51,0,g);for(let i=0;i<6;i++){const f=food(s.ingredient);f.position.set((i%3-1)*.45,1.45,(Math.floor(i/3)-.5)*.43);f.rotation.y=i;g.add(f)}}
+if(s.kind==='source'){binIcon(s.ingredient,g);box(1.65,.14,1.05,0xb68a55,0,1.36,0,g);for(const z of [-.48,.48])box(1.65,.24,.09,0xcaa26a,0,1.51,z,g);for(const x of [-.81,.81])box(.09,.24,1.05,0xcaa26a,x,1.51,0,g);for(let i=0;i<6;i++){const f=food(s.ingredient);f.position.set((i%3-1)*.45,1.45,(Math.floor(i/3)-.5)*.43);f.rotation.y=i;g.add(f)}}
 if(s.kind==='board'){box(1.4,.06,.85,0xc79963,0,1.32,0,g);box(.035,.035,.65,0xb48858,.6,1.36,0,g);const knife=box(.38,.04,.1,0xd6d9c8,.6,1.4,.1,g);knife.rotation.y=.3;box(.24,.06,.1,0x637363,.89,1.4,.02,g)}
 if(s.kind==='pot'){let burner,potSoup;const steam=[];box(1.75,.10,1.1,0x606f63,0,1.34,0,g);for(const x of [-.43,.43]){cyl(.3,.3,.04,0x364e46,x,1.41,0,g);torus(.22,.03,0x7e8b7d,x,1.44,0,g)}burner=torus(.31,.045,0xf2a34e,0,1.44,0,g);cyl(.48,.38,.52,0x92aba4,0,1.7,0,g);torus(.47,.04,0xcbd6bf,0,1.97,0,g);for(const x of [-.6,.6])box(.26,.08,.18,0x455d57,x,1.83,0,g);potSoup=cyl(.42,.42,.03,0xd09c63,0,1.955,0,g);potSoup.visible=false;for(let i=0;i<8;i++){const puff=sphere(.11,0xfff9e7,0,2.1,0,g);puff.material=new THREE.MeshBasicMaterial({color:0xfffaeb,transparent:true,opacity:.4,depthWrite:false});puff.userData.disposeMaterial=true;puff.visible=false;steam.push(puff)}potVisuals.push({burner,potSoup,steam,team:s.team??0});}
 if(s.kind==='sink'){box(1.5,.06,.97,0xa6b6a7,0,1.31,0,g);box(1.25,.045,.76,0x5f8784,0,1.35,0,g);box(1.05,.03,.58,0x8abbb7,0,1.38,0,g);cyl(.05,.05,.5,0x9fac9c,.62,1.58,-.39,g);const tap=torus(.18,.045,0xb6c4b3,.46,1.8,-.39,g);tap.rotation.x=0;box(.08,.12,.08,0xb6c4b3,.28,1.73,-.39,g)}
@@ -100,7 +110,7 @@ function buildLabels(){
  $('#station-labels').replaceChildren();for(const key of Object.keys(labels))delete labels[key];
  for(const s of stations){if(s.kind==='counter')continue;const el=document.createElement('div');el.className='station-label';if(s.team!==undefined)el.classList.add(`team-${s.team}`);$('#station-labels').append(el);labels[s.id]=el;}
 }
-const keys=new Set();let last=performance.now(),elapsed=0,hudTime=0,nearby=null,lastDynamic='',lastOrders='',toastTimer,muted=false,audio;
+const keys=new Set();let last=performance.now(),elapsed=0,hudTime=0,nearby=null,lastDynamic='',lastOrders='',toastTimer,muted=false,audio;let showAllLabels=false;
 let records={};try{records=JSON.parse(localStorage.getItem('kr-progress')||'{}')||{}}catch{}
 function recordKey(options=selected){return `${options.mode}:${options.map}:${options.level}`;}
 function getRecord(options=selected){const r=records[recordKey(options)]||{};return{best:Math.max(0,Number(r.best)||0),stars:Math.max(0,Math.min(3,Number(r.stars)||0))};}
@@ -115,6 +125,7 @@ function keydown(e){
  const input=e.target instanceof HTMLSelectElement;if(input)return;
  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight','Numpad0','Slash'].includes(e.code)&&match.status==='playing')e.preventDefault();
  if(e.code==='Enter'&&coop&&!match.bot&&match.status==='playing')e.preventDefault();
+ if(e.code==='KeyH'&&!e.repeat){e.preventDefault();toggleLabels();return;}
  if(e.code==='Escape'){if(!e.repeat)togglePause();return;}
  if(!$('#modal').hidden||match.status!=='playing')return;
  keys.add(e.code);if(e.repeat)return;if(e.code==='KeyE')interact(0);if(coop&&!match.bot&&e.code==='Enter')interact(1);if(e.code==='ShiftLeft')dash(0);if(coop&&!match.bot&&e.code==='ShiftRight')dash(1);
@@ -170,19 +181,37 @@ const viewCameras=[camera,camera.clone()];
 function project(x,y,z,team=0){const rect=viewRects()[versus?team:0],v=new THREE.Vector3(x,y,z).project(viewCameras[versus?team:0]);return{x:rect.x+(v.x*.5+.5)*rect.w,y:rect.y+(-v.y*.5+.5)*rect.h};}
 function renderRooms(){renderer.setScissorTest(true);const rects=viewRects();for(let i=0;i<rects.length;i++){const r=rects[i],y=wrap.clientHeight-r.y-r.h;renderer.setViewport(r.x,y,r.w,r.h);renderer.setScissor(r.x,y,r.w,r.h);renderer.render(i===0?scene:rivalScene,viewCameras[i]);}renderer.setScissorTest(false);}
 
+function toggleLabels(){showAllLabels=!showAllLabels;$('#labels-toggle').setAttribute('aria-pressed',String(showAllLabels));$('#labels-toggle').textContent=showAllLabels?'H · Tên quầy':'H · Nhãn gọn';updateLabels();}
+$('#labels-toggle').onclick=toggleLabels;
 function updateLabels(){
- for(const s of stations){const el=labels[s.id];if(!el)continue;const p=project(s.x,s.kind==='pot'?2.5:1.9,s.z,s.team??0);el.style.left=`${p.x}px`;el.style.top=`${p.y}px`;el.classList.toggle('near',nearby?.id===s.id&&match.status==='playing');
-  const state=stationGame(s);let text=s.ingredient?INGREDIENTS[s.ingredient].name.toUpperCase():stationNames[s.kind],progress=null;
-  if(s.kind==='board'&&state.board){progress=state.board.progress;text=progress>=1?'✓ ĐÃ THÁI':`THÁI · ${Math.round(progress*100)}%`}
-  if(s.kind==='pot'){if(state.pot.burnt){text='🔥 GIỮ ĐỂ DẬP LỬA';progress=state.pot.fireWork}else if(state.pot.ready)text='✓ SÚP ĐÃ CHÍN';else if(state.pot.ingredients.length===2){text='ĐANG NẤU';progress=state.pot.time/state.config.cookTime}else text=`BẾP NẤU · ${state.pot.ingredients.length}/2`}
-  if(s.kind==='plates')text='ĐĨA · '+state.plates;if(s.kind==='sink'){text='RỬA · '+state.dirty;if(game.wash>0)progress=game.wash}
-  if(s.kind==='grill'){text=state.grill.burnt?'🔥 DẬP LỬA':state.grill.ready?'✓ THỊT CHÍN':'CHẢO NƯỚNG';if(state.grill.item&&!state.grill.burnt)progress=Math.min(1,state.grill.time/7);if(state.grill.burnt)progress=state.grill.fireWork}
-  if(s.kind==='assembly'&&state.assembly)text=matchAssembly(state.assembly.components)?'✓ '+matchAssembly(state.assembly.components).name.toUpperCase():`RÁP MÓN · ${state.assembly.components.length} phần`;
-  if(s.team!==undefined&&['board','pot'].includes(s.kind))text=`${s.team===0?'P1':match.bot?'BOT':'P2'} · ${text}`;
-  el.innerHTML=text+(progress!==null?`<span class="progress"><i style="width:${progress*100}%"></i></span>`:'');
+ const focusedIds=new Set();if(match.status==='playing'){for(let i=0;i<(coop&&!match.bot?2:1);i++){const target=nearest(players[i]);if(target)focusedIds.add(target.id)}}
+ for(const s of stations){
+  const el=labels[s.id];if(!el)continue;const state=stationGame(s),focused=focusedIds.has(s.id),full=showAllLabels||focused;
+  let text=s.ingredient?`${INGREDIENTS[s.ingredient].emoji} ${INGREDIENTS[s.ingredient].name}`:stationNames[s.kind],progress=null,alert=false,active=false;
+  if(s.kind==='board'&&state.board){active=state.board.progress>0;progress=state.board.progress; text=full?(progress>=1?'✓ Đã thái':`Thái · ${Math.round(progress*100)}%`):progress>=1?'✓':'🔪';}
+  if(s.kind==='pot'){
+   active=state.pot.ingredients.length===2;alert=state.pot.burnt;
+   if(alert){text=full?'🔥 Nồi cháy · giữ Space':'🔥';progress=state.pot.fireWork;}
+   else if(state.pot.ready)text=full?'✓ Súp đã chín':'✓ 🍲';
+   else if(active){text=full?'Đang nấu':'🍲';progress=state.pot.time/state.config.cookTime;}
+   else text=`Nồi súp · ${state.pot.ingredients.length}/2`;
+  }
+  if(s.kind==='grill'){
+   active=!!state.grill.item;alert=state.grill.burnt;
+   text=alert?(full?'🔥 Chảo cháy · giữ Space':'🔥'):state.grill.ready?(full?'✓ Thịt đã chín':'✓ 🥩'):full?'Chảo nướng':'🍳';
+   if(active&&!alert)progress=Math.min(1,state.grill.time/7);if(alert)progress=state.grill.fireWork;
+  }
+  if(s.kind==='plates')text=`Đĩa sạch · ${state.plates}`;
+  if(s.kind==='sink'){text=`Bồn rửa · ${state.dirty} đĩa bẩn`;if(state.wash>0){active=true;progress=state.wash;if(!full)text='🫧';}}
+  if(s.kind==='assembly'&&state.assembly){const meal=matchAssembly(state.assembly.components);active=!!meal;text=full?(meal?'✓ '+meal.name:`Ráp món · ${state.assembly.components.length} phần`):'✓ '+meal?.emoji;}
+  el.hidden=!full&&!active&&!alert;if(el.hidden)continue;
+  el.classList.toggle('near',focused);el.classList.toggle('status-only',!full);el.classList.toggle('alert',alert);
+  const pos=project(s.x,s.kind==='pot'?2.5:2.05,s.z,s.team??0);el.style.left=pos.x+'px';el.style.top=pos.y+'px';
+  el.innerHTML=text+(progress!==null?`<span class="progress"><i style="width:${Math.min(1,progress)*100}%"></i></span>`:'');
  }
  const hint=$('#context-hint');if(match.status==='playing'&&nearby){hint.style.display='block';hint.innerHTML=contextHint(nearby,players[0]);}else hint.style.display='none';
 }
+
 function contextHint(s,p){
  let key='E',text='';if(s.team!==undefined&&s.team!==p.team)return '● Quầy xanh của đối thủ';const state=gameFor(0);
  if(s.kind==='source')text=`Lấy ${INGREDIENTS[s.ingredient].name.toLowerCase()}`;
