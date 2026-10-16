@@ -1,11 +1,7 @@
+import {createAlternateSets} from './scenery.js';
 import * as THREE from 'three';
 import {mergeGeometries} from 'three/addons/utils/BufferGeometryUtils.js';
 import {RoundedBoxGeometry} from 'three/addons/geometries/RoundedBoxGeometry.js';
-import {EffectComposer} from 'three/addons/postprocessing/EffectComposer.js';
-import {RenderPass} from 'three/addons/postprocessing/RenderPass.js';
-import {SSAOPass} from 'three/addons/postprocessing/SSAOPass.js';
-import {UnrealBloomPass} from 'three/addons/postprocessing/UnrealBloomPass.js';
-import {OutputPass} from 'three/addons/postprocessing/OutputPass.js';
 
 // Batch only immutable meshes. Interactive props, particles and animated flames
 // keep their own objects; source geometry is converted into the root's space.
@@ -139,18 +135,18 @@ export function createPresentation(scene,renderer,camera){
  const points=new Float32Array(80*3);for(let i=0;i<80;i++){points[i*3]=Math.sin(i*21.7)*14;points[i*3+1]=-3+(i%11)*.17;points[i*3+2]=Math.cos(i*13.1)*11;}
  const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.BufferAttribute(points,3));const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0x90ffe1,map:glowMap,size:.14,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));environment.add(dust);
  // Wet patches retain exactly the physical positions defined by each map.
- const puddles=new THREE.Group();environment.add(puddles);
- function setTheme(map){
+ const puddles=new THREE.Group();scene.add(puddles);const alternateSets=createAlternateSets(scene,batchStatic);
+ function setTheme(map){environment.visible=map.id==='sunny';alternateSets.setTheme(map.id);
   scene.background.set(map.id==='market'?0x121026:0x0c1830);scene.fog.color.copy(scene.background);
   const tint=map.id==='market'?0x50415e:map.id==='harbor'?0x33536d:0x444660;darkStone.color.set(tint);mistMaterial.uniforms.tint.value.set(map.id==='market'?0x5360d5:0x00d8bd);
   for(const child of [...puddles.children]){puddles.remove(child);child.geometry.dispose();child.material.dispose();}
   for(const h of map.hazard){const p=new THREE.Mesh(new THREE.CircleGeometry(1,32),new THREE.MeshPhysicalMaterial({color:0x54a9c2,transparent:true,opacity:.3,roughness:.12,metalness:.25,depthWrite:false}));p.rotation.x=-Math.PI/2;p.position.set(h.x,.205,h.z);p.scale.set(h.rx,h.rz,1);puddles.add(p);}
  }
  batchStatic(environment);
- const target=new THREE.WebGLRenderTarget(1,1,{type:THREE.HalfFloatType});target.samples=Math.min(4,renderer.capabilities.maxSamples);const composer=new EffectComposer(renderer,target);let pixelRatio=renderer.getPixelRatio();composer.addPass(new RenderPass(scene,camera));
- const ssao=new SSAOPass(scene,camera,1,1,12);ssao.kernelRadius=3;ssao.minDistance=.002;ssao.maxDistance=.15;composer.addPass(ssao);
- const bloom=new UnrealBloomPass(new THREE.Vector2(1,1),.28,.45,1.25);composer.addPass(bloom);composer.addPass(new OutputPass());
- function resize(w,h){if(pixelRatio!==renderer.getPixelRatio()){pixelRatio=renderer.getPixelRatio();composer.setPixelRatio(pixelRatio);}composer.setSize(w,h);ssao.enabled=w>=850;ssao.setSize(Math.max(1,Math.round(w*.75)),Math.max(1,Math.round(h*.75)));}
+ // Direct rendering avoids the full-resolution SSAO, MSAA and bloom stack.
+ // Emissive materials and glow sprites retain the lighting cues at one pass.
+ let lightCount=0;environment.traverse(o=>{if(o.isPointLight){o.visible=lightCount++<2;}});
+ function resize(){}
  function update(time){mistMaterial.uniforms.time.value=time;for(const p of portals)p.uniforms.time.value=time;for(const fire of fires){const flicker=1+Math.sin(time*9+fire.phase)*.12+Math.sin(time*17+fire.phase)*.05;fire.flame.scale.set(1,flicker,1);fire.light.intensity=30*flicker;fire.f.rotation.z=Math.sin(time*7+fire.phase)*.12;}dust.rotation.y=Math.sin(time*.035)*.04;}
- return {materials,setTheme,resize,update,render:()=>composer.render()};
+ return {materials,setTheme,resize,update,render:()=>renderer.render(scene,camera)};
 }

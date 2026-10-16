@@ -19,6 +19,7 @@ export class ChefBot{
       else if(game.grill.item)this.recipe=RECIPES.find(r=>r.id==='burger');
     }
     if(!this.recipe)this.recipe=candidates[0];
+    const fire=this.stations.find(s=>game.fires?.[s.id]);if(fire){if(p.item)return{station:own('trash'),label:'Dọn tay cứu bếp'};return{station:fire,work:true,label:'Dập lửa quầy bếp'}};
     const park=()=>({station:this.stations.find(s=>s.kind==='counter'&&!game.counters[s.id])||own('trash'),label:'Đặt đồ tạm để nhường quầy'});
     const source=ingredient=>({station:this.stations.find(s=>s.kind==='counter'&&game.counters[s.id]?.ingredient===ingredient)||this.stations.find(s=>s.ingredient===ingredient),label:`Lấy ${INGREDIENTS[ingredient].name.toLowerCase()}`});
     for(const kind of ['pot','grill'])if(game[kind].burnt){if(p.item)return task(p.item.kind==='plate'?'sink':'trash',false,'Dọn tay để dập lửa');return task(kind,true,'Dập lửa');}
@@ -46,6 +47,7 @@ export class ChefBot{
   }
   update(game,p,dt,others=[]){
     p.moving=false;p.work=false;if(game.status!=='playing')return;
+    if(this.stations.some(s=>s.dynamic)||this.map.moving){this.navRefresh=(this.navRefresh||0)-dt;if(this.navRefresh<=0){this.navigator=createNavigator(this.stations);this.path=[];this.navRefresh=.75}}
     recoverChef(p,this.stations,others);this.repathWait=Math.max(0,(this.repathWait||0)-dt);
     this.wait=Math.max(0,this.wait-dt);const task=this.choose(game,p);this.label=task.label;if(!task.station)return;
     if(nearestStation(p,this.stations)?.id===task.station.id&&Math.hypot(p.x-task.station.x,p.z-task.station.z)<1.55){

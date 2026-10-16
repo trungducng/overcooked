@@ -2,7 +2,8 @@ import { STATIONS } from './engine.js';
 
 export const MODES = {
   solo: { name: 'Một mình', icon: '♨', description: 'Chinh phục 9 màn và săn đủ 3 sao.' },
-  coop: { name: 'Đồng đội', icon: '♡', description: 'Hai người, chung căn bếp và chung điểm.' },
+  assist: {name:'Cùng phụ bếp',icon:'✿',description:'Bạn và bot chung điểm. Bot nhận đồ, nấu, rửa và nhường quầy.'},
+  coop: { name: 'Đồng đội', icon: '♡', description: '2–4 người, chung căn bếp và chung điểm.' },
   pvp: { name: 'Đấu tay đôi', icon: '⚔', description: 'Hai người cùng bàn phím. Chung một bếp, tranh đơn và đua điểm!' },
   bot: { name: 'Đấu với bot', icon: '✦', description: 'So tài ngay trong cùng bếp. Dụng cụ và nguyên liệu dùng chung.' },
 };

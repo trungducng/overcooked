@@ -1,0 +1,16 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {ItemHandling} from '../src/handling.js';
+import {collides} from '../src/navigation.js';
+const raw=()=>({kind:'raw',ingredient:'tomato'});
+const setup=()=>{const kitchen={counters:{}},stations=[],h=new ItemHandling(stations,kitchen),a={id:0,x:0,z:0,dir:Math.PI/2,item:raw()},b={id:1,x:1,z:0,item:null};return{h,a,b,kitchen,stations}};
+test('handoff moves the same object once to a facing empty-handed chef',()=>{const{h,a,b}=setup(),item=a.item;assert.ok(h.handoff(a,[a,b]));assert.equal(b.item,item);assert.equal(a.item,null);assert.equal(h.handoff(a,[a,b]),false)});
+test('handoff rejects occupied hands, distant chefs and chefs behind',()=>{const{h,a,b}=setup();b.item=raw();assert.equal(h.handoff(a,[b]),false);b.item=null;b.x=3;assert.equal(h.handoff(a,[b]),false);b.x=-1;assert.equal(h.handoff(a,[b]),false);assert.ok(a.item)});
+test('all item types can be dropped and picked up without cloning',()=>{for(const item of [raw(),{kind:'plate'},{kind:'meal',recipe:'tomato'}]){const{h,a}=setup();a.item=item;assert.ok(h.drop(a));assert.equal(a.item,null);assert.ok(h.pickup(a));assert.equal(a.item,item);assert.equal(h.items.length,0)}});
+test('drop near a wall finds a free floor point',()=>{const{h,a,stations}=setup();stations.push({kind:'counter',x:.8,z:0});assert.ok(h.drop(a));assert.equal(collides(h.items[0].x,h.items[0].z,stations),false)});
+test('raw and chopped ingredients can be thrown; plates, meals and cooked meat cannot',()=>{for(const kind of ['raw','chopped','plate','meal','cooked']){const{h,a}=setup();a.item={kind,ingredient:'beef'};const valid=['raw','chopped'].includes(kind);assert.equal(h.throw(a),valid);assert.equal(a.item===null,valid)}});
+test('empty-handed chef catches a throw even at a low simulation frame rate',()=>{const{h,a,b}=setup(),item=a.item;b.x=2.5;h.throw(a);h.tick(1,[a,b]);assert.equal(b.item,item);assert.equal(h.items.length,0);assert.equal(a.item,null)});
+test('busy chef does not catch, owner cannot catch their own throw',()=>{const{h,a,b}=setup();b.item=raw();h.throw(a);h.tick(1,[a,b]);assert.equal(h.items.length,1);assert.equal(h.items[0].flight,null);assert.equal(a.item,null)});
+test('uncaught throw lands on a free counter',()=>{const{h,a,stations,kitchen}=setup();stations.push({id:'pass',kind:'counter',x:5,z:0});const item=a.item;h.throw(a);h.tick(1,[a]);assert.equal(kitchen.counters.pass,item);assert.equal(h.items.length,0)});
+test('occupied counter or room boundary does not destroy an ingredient',()=>{const{h,a,stations,kitchen}=setup();stations.push({id:'pass',kind:'counter',x:5,z:0});kitchen.counters.pass=raw();h.throw(a);h.tick(1,[a]);assert.equal(h.items.length,1);assert.equal(collides(h.items[0].x,h.items[0].z,stations),false);assert.ok(kitchen.counters.pass)});
+test('solid obstacle stops a thrown ingredient, which remains recoverable',()=>{const{h,a,stations}=setup();stations.push({id:'wall',kind:'obstacle',x:2,z:0,width:.5,depth:4});h.throw(a);h.tick(1,[a]);assert.ok(h.items[0].x<2);assert.equal(h.items[0].flight,null);assert.equal(collides(h.items[0].x,h.items[0].z,stations),false)});
