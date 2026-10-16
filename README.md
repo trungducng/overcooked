@@ -46,3 +46,9 @@ Online dùng PeerJS 1.5.5/WebRTC với signaling công cộng. Host giữ vật,
 QA đã nối 4 phiên trình duyệt cùng máy qua signaling thật, di chuyển P2/P3/P4, ném/bắt qua mạng, reconnect P2 giữ nguyên vật. Chưa kiểm chứng nhiều thiết bị/mạng, packet-loss hoặc gamepad thật; không tuyên bố các phần đó đạt cổng 90%.
 
 Xem [trạng thái lộ trình](docs/implementation-plan.md) và [bằng chứng bản hoàn thiện](docs/milestones/R2-roadmap.md).
+
+## Mobile và iPad
+
+Tự nhận diện cảm ứng qua `any-pointer: coarse` hoặc `maxTouchPoints` (bao gồm iPad trình duyệt desktop). Cần kéo trái, Lấy/Đặt phải, giữ nút dao để thái/rửa/dập lửa; Ném, Thả, Lướt riêng. Hai pointer độc lập; thả/cancel/chuyển tab/pause/xoay máy trả input về 0. Camera và HUD dành khoảng trống cho hai ngón, `viewport-fit=cover` + safe area cho tai thỏ/thanh home. Chơi dọc được, ngang nhìn bếp rộng hơn.
+
+Một màn cảm ứng điều khiển một người; local nhiều chef cần thêm bàn phím hoặc tay cầm. Mỗi người dùng điện thoại/iPad riêng thì vào cùng mã phòng online. Có nút Cảm ứng để bật thử trên máy dùng chuột. Đã QA viewport 390×844, 844×390, 1024×768; kéo joystick và bấm lướt trong browser, kiểm tra lifecycle đa pointer tự động. Chưa chạy trên Safari/iPad phần cứng thật.
