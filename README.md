@@ -75,3 +75,7 @@ Nhãn chữ mặc định chỉ hiện tại quầy đang tương tác. Biểu t
 ## Lộ trình tiếp theo
 
 Xem [kế hoạch triển khai tuần tự](docs/implementation-plan.md). Mỗi mốc phải vượt cổng nghiệm thu 90% trước khi sang mốc tiếp; chưa công bố toàn game đạt 90% Overcooked! 2.
+
+## M1 — Di chuyển và lướt
+
+Các đầu bếp chặn và lách qua nhau trong bếp chung. Di chuyển được chia thành bước nhỏ để cú lướt không xuyên quầy/người; đi chéo vẫn trượt dọc mép quầy. Shift trái/phải lướt theo hướng đi (hoặc hướng nhìn khi đứng yên), có hồi chiêu 1,1 giây; chỉ báo nằm ở hàng điều khiển. Màn hình nhỏ có thêm nút LƯỚT. Pause hủy cú lướt và đóng băng hồi chiêu; reset xóa vận tốc. Bot tìm đường tránh người và lập lại đường khi bị chắn. Xem [nghiệm thu M1](docs/milestones/M1-movement.md).

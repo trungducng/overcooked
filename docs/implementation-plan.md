@@ -15,8 +15,8 @@ Toàn bộ game chỉ được nhận mức 90% trong phạm vi đã thống nh�
 | Mốc | Trọng số | Phần việc và kết quả cần có | Cổng nghiệm thu lõi | Trạng thái |
 | --- | ---: | --- | --- | --- |
 | M0 | 10% | Một bếp chung cho mọi chế độ; thớt/nồi/chảo/đĩa/bàn trống là vật thể chung; PvP giữ điểm theo người giao | Chuyển việc người A → B không nhân đôi/mất đồ; bot không kẹt vì đồ dở; đồng hồ bếp chạy một lần | Đạt 9/10 ca kỹ thuật; xem M0 |
-| M1 | 10% | Di chuyển, va chạm đầu bếp, lướt, trượt dọc góc quầy; camera giữ đủ không gian thao tác | Hai người cản nhau có thể thoát; không xuyên quầy/kẹt góc; lướt dễ dự đoán bằng bàn phím và cảm ứng | Kế tiếp; chưa triển khai |
-| M2 | 10% | Lấy/đặt/handoff rõ ràng, thả xuống sàn, ném/bắt nguyên liệu hợp lệ; báo vật đang nhắm | Bắt khi tay trống, rơi khi không bắt, không ném vật cấm, không nhân đồ; người nhận tiếp tục chế biến | Chờ M1 |
+| M1 | 10% | Di chuyển, va chạm đầu bếp, lướt, trượt dọc góc quầy; camera giữ đủ không gian thao tác | Hai người cản nhau có thể thoát; không xuyên quầy/kẹt góc; lướt dễ dự đoán bằng bàn phím và cảm ứng | Đạt 9/10 ca kỹ thuật; xem M1 |
+| M2 | 10% | Lấy/đặt/handoff rõ ràng, thả xuống sàn, ném/bắt nguyên liệu hợp lệ; báo vật đang nhắm | Bắt khi tay trống, rơi khi không bắt, không ném vật cấm, không nhân đồ; người nhận tiếp tục chế biến | Kế tiếp; chưa triển khai |
 | M3 | 15% | Màn buộc phân vai: khu sơ chế và nấu cách nhau, cửa chuyển đồ, tài nguyên bố trí lệch; solo đổi đầu bếp | Co-op cần chuyển đồ thật; solo vẫn hoàn thành; PvP hai phía có cơ hội công bằng trong một không gian | Chờ M2 |
 | M4 | 15% | Bàn/cầu di chuyển, lối mở theo chu kỳ, băng chuyền, nền trơn và nguy cơ rơi; cảnh báo trước thay đổi | Vật/đầu bếp đi cùng nền đúng; không mắc kẹt vĩnh viễn; bot tìm đường lại; hồi sinh không mất quyền điều khiển | Chờ M3 |
 | M5 | 10% | Tinh chỉnh chuỗi chế biến, nhiều dụng cụ/cỡ công thức, đơn/tip/combo, thiếu đĩa và cháy lan có cứu chữa | Áp lực đến từ nhiều công việc song song; phục hồi được sau sai sót; điểm có thể giải thích; bỏ bonus tự chế nếu làm lệch nhịp tham chiếu | Chờ M4 |
@@ -38,4 +38,4 @@ Mỗi lần giao bản: ghi phần hoàn thành, ca chưa đạt, bằng chứng
 - [Ghost Town Games — Building truly cooperative play](https://www.gamedeveloper.com/design/game-design-deep-dive-building-truly-cooperative-play-in-i-overcooked-i-): bố trí bếp tạo phụ thuộc, giao tiếp và phối hợp.
 - [Team17 — Overcooked! 2 FAQ](https://www.team17.com/news/overcooked-2-faq): phạm vi chơi local/online.
 
-Ba map × ba cấu hình độ khó hiện tại chưa tương đương chín màn thiết kế riêng. Va chạm đầu bếp, ném/bắt, map động, bốn người và online chưa có trong bản hiện tại.
+Ba map × ba cấu hình độ khó hiện tại chưa tương đương chín màn thiết kế riêng. Va chạm đầu bếp và lướt có hồi chiêu đã có ở M1. Ném/bắt, map động, bốn người và online chưa có trong bản hiện tại.

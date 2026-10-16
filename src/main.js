@@ -3,7 +3,8 @@ import {INGREDIENTS,RECIPES,matchAssembly} from './engine.js';
 import {KitchenMatch} from './match.js';
 import {MAPS,LEVELS,MODES,getMap,ROOM_SCALE,stationsForTeam} from './levels.js';
 import {BOT_DIFFICULTIES} from './bot.js';
-import {collides,nearestStation,speedMultiplier} from './navigation.js';
+import {nearestStation} from './navigation.js';
+import {stepChef,requestDash,resetMotion,stopDash,DASH_COOLDOWN} from './movement.js';
 const $=s=>document.querySelector(s),wrap=$('#canvas-wrap');
 let selected={mode:'solo',map:'sunny',level:0,difficulty:'normal'},match=new KitchenMatch(selected),game=match.games[0],stations=match.stations,activeMap=match.map,versus=false,coop=false,orderTeam=0,resultShown=false;
 const gameFor=i=>match.gameFor(i);
@@ -116,7 +117,8 @@ function totalStars(mode){return MAPS.reduce((sum,map)=>sum+LEVELS.reduce((n,_,l
 try{muted=localStorage.getItem('kr-muted')==='1'}catch{}
 function sound(freq=500,duration=.1){if(muted)return;try{audio??=new (window.AudioContext||window.webkitAudioContext)();audio.resume();const osc=audio.createOscillator(),gain=audio.createGain();osc.type='sine';osc.frequency.setValueAtTime(freq,audio.currentTime);osc.frequency.exponentialRampToValueAtTime(freq*1.5,audio.currentTime+duration);gain.gain.setValueAtTime(.035,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+duration);osc.connect(gain).connect(audio.destination);osc.start();osc.stop(audio.currentTime+duration)}catch{}}
 function toast(text){$('#toast').textContent=text;$('#toast').classList.add('visible');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('#toast').classList.remove('visible'),3200)}
-const nearest=p=>nearestStation(p,stationsForTeam(stations,p.team??0)),collision=(x,z,p)=>collides(x,z,stationsForTeam(stations,p.team??0));
+const nearest=p=>nearestStation(p,stationsForTeam(stations,p.team??0));
+const movementInput=i=>({x:Number(keys.has(i===0?'KeyD':'ArrowRight'))-Number(keys.has(i===0?'KeyA':'ArrowLeft')),z:Number(keys.has(i===0?'KeyS':'ArrowDown'))-Number(keys.has(i===0?'KeyW':'ArrowUp'))});
 function interact(i){if(match.status!=='playing'||i===1&&match.bot)return;const p=players[i],s=nearest(p);if(s){p.dir=Math.atan2(s.x-p.x,s.z-p.z);if(gameFor(i).action(p,s))sound(420,.07)}else toast('Đến gần một quầy bếp để tương tác.');processEvents();updateHud();}
 function keydown(e){
  const input=e.target instanceof HTMLSelectElement;if(input)return;
@@ -128,21 +130,23 @@ function keydown(e){
  keys.add(e.code);if(e.repeat)return;if(e.code==='KeyE')interact(0);if(coop&&!match.bot&&e.code==='Enter')interact(1);if(e.code==='ShiftLeft')dash(0);if(coop&&!match.bot&&e.code==='ShiftRight')dash(1);
 }
 window.addEventListener('keydown',keydown);window.addEventListener('keyup',e=>keys.delete(e.code));window.addEventListener('blur',()=>{keys.clear();if(match.status==='playing')showPause()});
-function dash(i){const p=players[i];if(match.status==='playing'&&p.cooldown<=0){p.dash=.17;p.cooldown=1.1;sound(220,.08)}}
-for(const btn of document.querySelectorAll('[data-key]')){btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture(e.pointerId);keys.add(btn.dataset.key);if(btn.dataset.key==='KeyE')interact(0)});for(const event of ['pointerup','pointercancel','lostpointercapture'])btn.addEventListener(event,()=>keys.delete(btn.dataset.key))}
+function dash(i){if(match.status==='playing'&&(players[i].cooldown||0)<=0)players[i].dashRequested=true;}
+for(const btn of document.querySelectorAll('[data-key]')){btn.addEventListener('pointerdown',e=>{e.preventDefault();btn.setPointerCapture(e.pointerId);keys.add(btn.dataset.key);if(btn.dataset.key==='KeyE')interact(0);if(btn.dataset.key==='ShiftLeft')dash(0)});for(const event of ['pointerup','pointercancel','lostpointercapture'])btn.addEventListener(event,()=>keys.delete(btn.dataset.key))}
 function animateChef(p,dt){
  p.root.position.set(p.x,.17,p.z);const delta=THREE.MathUtils.euclideanModulo(p.dir-p.body.rotation.y+Math.PI,Math.PI*2)-Math.PI;p.body.rotation.y+=delta*Math.min(1,dt*16);
- p.body.position.y=p.moving?Math.abs(Math.sin(elapsed*14))*.08:p.work?Math.sin(elapsed*22)*.035:Math.sin(elapsed*2.5)*.012;p.body.rotation.z=p.moving?Math.sin(elapsed*14)*.035:0;
+ p.ring.scale.setScalar(p.dash>0?1.22:1);
+ p.body.position.y=p.moving?Math.abs(Math.sin(elapsed*14))*.08:p.work?Math.sin(elapsed*22)*.035:Math.sin(elapsed*2.5)*.012;p.body.rotation.z=p.dash>0?-.14:p.moving?Math.sin(elapsed*14)*.035:0;
  p.legs[0].position.z=p.moving?Math.sin(elapsed*14)*.12+.06:.06;p.legs[1].position.z=p.moving?-Math.sin(elapsed*14)*.12+.06:.06;p.held.rotation.x=p.work?Math.sin(elapsed*20)*.2:0;
 }
 function movePlayer(p,i,dt){
- if(match.status!=='playing')return;p.cooldown=Math.max(0,p.cooldown-dt);p.dash=Math.max(0,p.dash-dt);
- let dx=Number(keys.has(i===0?'KeyD':'ArrowRight'))-Number(keys.has(i===0?'KeyA':'ArrowLeft'));
- let dz=Number(keys.has(i===0?'KeyS':'ArrowDown'))-Number(keys.has(i===0?'KeyW':'ArrowUp'));p.moving=!!(dx||dz);p.work=false;
- if(p.moving){const len=Math.hypot(dx,dz);dx/=len;dz/=len;const worldX=dx*.868+dz*.496,worldZ=-dx*.496+dz*.868,speed=(p.dash>0?10.5:3.8)*speedMultiplier(p,activeMap);const nx=p.x+worldX*speed*dt,nz=p.z+worldZ*speed*dt;if(!collision(nx,p.z,p))p.x=nx;if(!collision(p.x,nz,p))p.z=nz;p.dir=Math.atan2(worldX,worldZ)}
- else if(keys.has(i===0?'Space':'Numpad0')||i===1&&keys.has('Slash')){const s=nearest(p);p.work=gameFor(i).work(p,s,dt);if(p.work&&s)p.dir=Math.atan2(s.x-p.x,s.z-p.z)}
+ if(match.status!=='playing')return;
+ const input=movementInput(i);
+ if(p.dashRequested){p.dashRequested=false;if(requestDash(p,input))sound(220,.08)}
+ stepChef(p,input,dt,stations,activeMap,players.filter(other=>other!==p&&other.active));
+ if(!input.x&&!input.z&&!p.dash&&(keys.has(i===0?'Space':'Numpad0')||i===1&&keys.has('Slash'))){const s=nearest(p);p.work=gameFor(i).work(p,s,dt);if(p.work&&s)p.dir=Math.atan2(s.x-p.x,s.z-p.z)}
  animateChef(p,dt);
 }
+
 function replaceGroup(g){while(g.children.length){const o=g.children[0];g.remove(o);disposeTree(o)}}
 function stationGame(s){return match.games[s.team??0];}
 function updateDynamic(){
@@ -171,7 +175,8 @@ function updateHud(){
  if(versus){const rival=match.games[1];$('#shared-supply').textContent=`BẾP CHUNG · ${game.plates} đĩa sạch · ${game.dirty} đĩa bẩn`;$('#team0-score').textContent=game.score;$('#team1-score').textContent=rival.score;$('#team0-detail').textContent=`${game.served} món · CAM`;$('#team1-detail').textContent=`${rival.served} món · XANH`;
   $('#battle-status').textContent=game.score===rival.score?'NGANG TÀI':game.score>rival.score?'BẠN ĐANG DẪN TRƯỚC':'ĐỐI THỦ ĐANG DẪN';$('#bot-status').textContent=match.bot?match.bot.label:'Mũi tên · Enter · /';
  }
- renderer.domElement.dataset.state=JSON.stringify({status:match.status,mode:selected.mode,layout:'shared',stationCount:stations.length,map:selected.map,level:selected.level+1,time:Math.round(match.time),players:players.map(p=>({x:+p.x.toFixed(3),z:+p.z.toFixed(3),item:p.item,team:p.team})),teams:match.games.map(g=>({score:g.score,served:g.served,pot:g.pot,board:g.board,plates:g.plates,dirty:g.dirty,grill:g.grill,assembly:g.assembly})),bot:match.bot?.label});updateDynamic();
+ const cooldown=players[0].cooldown||0;$('#dash-state').textContent=cooldown>0?`Lướt · ${cooldown.toFixed(1)}s`:'Lướt sẵn sàng';$('#dash-state').style.setProperty('--dash-ready',`${(1-cooldown/DASH_COOLDOWN)*100}%`);$('#touch-dash').classList.toggle('cooling',cooldown>0);$('#touch-dash').setAttribute('aria-label',cooldown>0?`Lướt đang hồi ${cooldown.toFixed(1)} giây`:'Lướt nhanh');const p2Cooldown=players[1].cooldown||0;$('#p2-controls').textContent=`P2: ↑ ↓ ← → · Enter · / · Shift phải · ${p2Cooldown>0?'Lướt '+p2Cooldown.toFixed(1)+'s':'Lướt sẵn sàng'}`;
+ renderer.domElement.dataset.state=JSON.stringify({status:match.status,mode:selected.mode,layout:'shared',keys:[...keys],stationCount:stations.length,map:selected.map,level:selected.level+1,time:Math.round(match.time),players:players.map(p=>({x:+p.x.toFixed(3),z:+p.z.toFixed(3),item:p.item,team:p.team,active:p.active,dash:+(p.dash||0).toFixed(3),cooldown:+(p.cooldown||0).toFixed(2)})),teams:match.games.map(g=>({score:g.score,served:g.served,pot:g.pot,board:g.board,plates:g.plates,dirty:g.dirty,grill:g.grill,assembly:g.assembly})),bot:match.bot?.label});updateDynamic();
 }
 function viewRects(){return[{x:0,y:0,w:wrap.clientWidth,h:wrap.clientHeight}];}
 const viewCameras=[camera];
@@ -224,7 +229,7 @@ function processEvents(){
   if(team===0&&(e.type==='chop'||e.type==='wash'))sound(750,.15);if(e.type==='fire'||e.type==='miss')sound(150,.3);if(e.type==='ready')sound(950,.2);
  }
 }
-function resize(){const w=wrap.clientWidth,h=wrap.clientHeight;renderer.setSize(w,h);const rects=viewRects();for(let i=0;i<rects.length;i++){const c=viewCameras[i],r=rects[i],aspect=r.w/r.h,halfHeight=Math.max(8.7,11.7/aspect);c.left=-halfHeight*aspect;c.right=halfHeight*aspect;c.top=halfHeight;c.bottom=-halfHeight;c.position.set(10.5,20,18);c.lookAt(0,.2,0);c.updateProjectionMatrix();}$('#room-titles').hidden=true;updateLabels();}
+function resize(){if(match.status!=='ready')$('#touch-controls').classList.toggle('active',matchMedia('(pointer:coarse)').matches||innerWidth<=700);const w=wrap.clientWidth,h=wrap.clientHeight;renderer.setSize(w,h);const rects=viewRects();for(let i=0;i<rects.length;i++){const c=viewCameras[i],r=rects[i],aspect=r.w/r.h,halfHeight=Math.max(8.7,11.7/aspect);c.left=-halfHeight*aspect;c.right=halfHeight*aspect;c.top=halfHeight;c.bottom=-halfHeight;c.position.set(10.5,20,18);c.lookAt(0,.2,0);c.updateProjectionMatrix();}$('#room-titles').hidden=true;updateLabels();}
 
 new ResizeObserver(resize).observe(wrap);
 function syncMatchUi(){
@@ -239,11 +244,11 @@ function syncMatchUi(){
 }
 function startGame(options=selected){
  match=new KitchenMatch(options);selected={...match.options};game=match.games[0];stations=match.stations;activeMap=match.map;versus=match.competitive;coop=selected.mode!=='solo';orderTeam=0;resultShown=false;lastDynamic='';lastOrders='';
- for(let i=0;i<players.length;i++){const p=players[i],spawn=activeMap.spawn[i];Object.assign(p,{item:null,x:spawn.x,z:spawn.z,cooldown:0,dash:0,dir:0,visualKey:'reset',moving:false,work:false,team:versus?i:0});roomScene(versus?i:0).add(p.root);p.root.visible=i===0||coop;p.root.position.set(p.x,.17,p.z);p.body.rotation.y=0;}
- buildStations();applyTheme();syncMatchUi();resize();selectOrderTeam(0);match.start();keys.clear();$('#start-card').hidden=true;$('#modal').hidden=true;$('#touch-controls').classList.toggle('active',matchMedia('(pointer:coarse)').matches);$('#floaters').replaceChildren();
+ for(let i=0;i<players.length;i++){const p=players[i],spawn=activeMap.spawn[i];Object.assign(p,{item:null,x:spawn.x,z:spawn.z,active:i===0||coop,dir:0,visualKey:'reset',moving:false,work:false,team:versus?i:0});resetMotion(p);roomScene(versus?i:0).add(p.root);p.root.visible=i===0||coop;p.root.position.set(p.x,.17,p.z);p.body.rotation.y=0;}
+ buildStations();applyTheme();syncMatchUi();resize();selectOrderTeam(0);match.start();keys.clear();$('#start-card').hidden=true;$('#modal').hidden=true;$('#touch-controls').classList.toggle('active',matchMedia('(pointer:coarse)').matches||innerWidth<=700);$('#floaters').replaceChildren();
  toast(versus?'Chung một bếp! Ai giao món sẽ nhận điểm; mọi người dùng chung dụng cụ và đĩa.':`${activeMap.name} · ${match.level.name}. Vào bếp thôi!`);sound(550,.2);updateHud();updateLabels();
 }
-function modal(content){keys.clear();$('#modal-content').innerHTML=content;$('#modal').hidden=false;$('#modal .close-modal').focus()}
+function modal(content){keys.clear();players.forEach(stopDash);$('#modal-content').innerHTML=content;$('#modal').hidden=false;$('#modal .close-modal').focus()}
 function showPause(){if(match.status!=='playing')return;match.status='paused';modal('<span class="eyebrow">NGHỈ TAY MỘT CHÚT</span><h2>Cả căn bếp cùng nghỉ.</h2><p>Thời gian, nồi súp và bot đều đang tạm dừng.</p><button class="primary-btn" id="resume">Nấu tiếp thôi <span>↗</span></button><button class="secondary-btn" id="change-match">Đổi chế độ / bản đồ</button><button class="secondary-btn" id="restart">Chơi lại màn này</button>');$('#resume').onclick=closeModal;$('#restart').onclick=()=>startGame();$('#change-match').onclick=openSetup;}
 function closeModal(){$('#modal').hidden=true;if(match.status==='paused')match.status='playing';if(match.status==='ended'){$('#start-card').hidden=false;$('#start-card h2').textContent='Thêm một trận nữa?'}keys.clear()}
 function togglePause(){if(!$('#modal').hidden){closeModal();return}showPause()}
@@ -256,7 +261,7 @@ function renderSetup(focusSelector){
  <div class="setup-section-label">02 <b>CHỌN CĂN BẾP</b><span>3 bản đồ · 9 màn chơi</span></div><div class="map-grid">${MAPS.map((m,i)=>`<button class="map-card ${draft.map===m.id?'selected':''}" data-map="${m.id}" aria-pressed="${draft.map===m.id}"><span class="map-art map-${m.id}"><i></i><i></i><i></i><b>${m.icon}</b></span><span class="map-meta"><small>0${i+1}</small><strong>${m.name}</strong><em>${LEVELS.reduce((sum,_,level)=>sum+getRecord({mode:draft.mode,map:m.id,level}).stars,0)}/9 ★</em></span></button>`).join('')}</div>
  <p class="map-description">${map.icon} ${map.subtitle}</p><div class="setup-bottom"><div class="level-picker"><div class="setup-section-label">03 <b>LEVEL</b></div><div class="level-buttons">${LEVELS.map((l,i)=>`<button data-level="${i}" class="${draft.level===i?'selected':''}" aria-pressed="${draft.level===i}"><b>0${i+1}</b><span>${l.name}<small>${'★'.repeat(getRecord({...draft,level:i}).stars)||l.tag}</small></span></button>`).join('')}</div></div>${draft.mode==='bot'?`<label class="bot-difficulty">TRÌNH ĐỘ BOT<select id="bot-difficulty">${Object.entries(BOT_DIFFICULTIES).map(([id,d])=>`<option value="${id}" ${draft.difficulty===id?'selected':''}>${d.name}</option>`).join('')}</select><small>Bot tự đi, thái, nấu và rửa đĩa.</small></label>`:''}</div>
  <div class="match-brief"><span><b>${Math.floor(level.duration/60)}:${String(level.duration%60).padStart(2,'0')}</b> phút / trận</span><span><b>${level.patience}s</b> mỗi đơn</span><span><b>${competitive?'ĐIỂM CAO THẮNG':level.goals[2]+'đ → ★★★'}</b></span></div>
- <p class="setup-controls">${draft.mode==='pvp'||draft.mode==='coop'?'P1: WASD · E · Space &nbsp; | &nbsp; P2: Mũi tên · Enter · /':'WASD di chuyển · E lấy / đặt · giữ Space để thao tác'}${competitive?'<br>Chung kho, thớt, nồi, chảo, đĩa và bàn ráp. Ai lấy món và giao sẽ nhận điểm; hai bên nhận cùng chuỗi công thức.':''}</p><button class="primary-btn" id="begin-match">${competitive?'Bắt đầu so tài':'Vào bếp thôi'} <span>↗</span></button></div>`);
+ <p class="setup-controls">${draft.mode==='pvp'||draft.mode==='coop'?'P1: WASD · E · Space &nbsp; | &nbsp; P2: Mũi tên · Enter · /':'WASD di chuyển · E lấy / đặt · giữ Space để thao tác · Shift để lướt'}${competitive?'<br>Chung kho, thớt, nồi, chảo, đĩa và bàn ráp. Ai lấy món và giao sẽ nhận điểm; hai bên nhận cùng chuỗi công thức.':''}</p><button class="primary-btn" id="begin-match">${competitive?'Bắt đầu so tài':'Vào bếp thôi'} <span>↗</span></button></div>`);
  for(const el of document.querySelectorAll('[data-mode]'))el.onclick=()=>{draft.mode=el.dataset.mode;renderSetup(`[data-mode="${draft.mode}"]`)};
  for(const el of document.querySelectorAll('[data-map]'))el.onclick=()=>{draft.map=el.dataset.map;renderSetup(`[data-map="${draft.map}"]`)};
  for(const el of document.querySelectorAll('[data-level]'))el.onclick=()=>{draft.level=Number(el.dataset.level);renderSetup(`[data-level="${draft.level}"]`)};
@@ -282,11 +287,11 @@ function readBest(){$('#best').textContent=getRecord().best}
 const tips=['<b>Salad</b>: đặt đĩa lên bàn ráp, thêm xà lách và cà chua đã thái. E tay không để lấy.','<b>Burger</b>: thái thịt bò, nướng 7 giây, ráp trên đĩa với bánh mì và cà chua thái.','<b>Combo</b>: giao đơn đầu tiên để tăng hệ số. Cao điểm mỗi 45 giây thưởng thêm 25%.','<b>Thi đấu</b>: chung bếp, chung dụng cụ. Ai giao món sẽ nhận điểm.','<b>Bot biết tự nấu!</b> Chọn Tập sự, Đầu bếp hoặc Bếp trưởng trong menu trận đấu.','<b>3 map × 3 level</b>. Đổi bản đồ bằng nút chế độ trên góc phải căn bếp.','<b>Bến cảng</b> có sàn ướt: đi vòng hoặc lướt qua để tiết kiệm thời gian.','Rửa đĩa sau khi giao món. Cả <b>người chơi lẫn bot</b> đều cần đĩa sạch.'];
 let tipIndex=0;setInterval(()=>{$('#tip').innerHTML=tips[tipIndex++%tips.length]},14000);
 function animate(now){
- requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.05);last=now;elapsed+=dt;
+ requestAnimationFrame(animate);const dt=Math.min((now-last)/1000,.1);last=now;elapsed+=dt;
  if(match.status==='playing'){match.tick(dt,players);if(match.status==='playing'){movePlayer(players[0],0,dt);if(coop){if(match.bot)animateChef(players[1],dt);else movePlayer(players[1],1,dt)}}nearby=nearest(players[0]);highlight.visible=!!nearby;if(nearby)highlight.position.set(nearby.x,1.315,nearby.z);processEvents()}else highlight.visible=false;
  if(match.status==='ready')players[0].body.position.y=Math.sin(elapsed*2.5)*.018;
  for(const v of potVisuals){const pot=match.games[v.team].pot,cooking=pot.ingredients.length===2;for(let i=0;i<v.steam.length;i++){const puff=v.steam[i];puff.visible=cooking;const t=(elapsed*.48+i/8)%1;puff.position.set(Math.sin(i*7+t*2)*.22,2.05+t*1.2,Math.cos(i*4+t*2)*.18);puff.scale.setScalar(.5+t);puff.material.opacity=(1-t)*.4;puff.material.color.set(pot.burnt?0x6b5140:0xfffaeb)}v.burner.material=mat(pot.burnt?0xe46b38:cooking?0xf2a34e:0x8d9078);v.burner.scale.setScalar(pot.burnt?1+Math.sin(elapsed*18)*.15:1);}
  hudTime+=dt;if(hudTime>.1){updateHud();updateLabels();hudTime=0}renderRooms();
 }
 $('#start-card .mini-spark').textContent='✦ 9 MÀN · 3 BẢN ĐỒ · PVP & BOT';$('#start-card h2').textContent='Bếp mới. Trận mới.';$('#start-card p').textContent='Nấu cùng bạn. Đấu tay đôi. Thách thức bot.';$('#start').innerHTML='Chọn trận đấu <span>↗</span>';
-players.forEach(p=>p.team=0);buildStations();applyTheme();syncMatchUi();updateHud();resize();requestAnimationFrame(animate);
+players.forEach((p,i)=>{p.team=0;p.active=i===0;resetMotion(p)});buildStations();applyTheme();syncMatchUi();updateHud();resize();requestAnimationFrame(animate);

@@ -24,7 +24,7 @@ export function getStations(mapId='sunny', versus=false) {
   const set=(id,x,z)=>Object.assign(stations.find(s=>s.id===id),{x,z});
   if(mapId==='harbor'){
     set('board',-2.25,-3);set('onion',4.5,-3);set('pot',2.25,-3);
-    set('plates',0,3);set('serve',4.5,3);
+    set('plates',2.25,3);set('serve',4.5,3);
     set('counter1',0,0);
   }
   if(mapId==='market'){

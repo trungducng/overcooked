@@ -18,7 +18,7 @@ export class KitchenMatch {
   set status(value){for(const game of this.games)game.status=value}
   get time(){return this.games[0].time}
   start(){this.status='playing'}
-  tick(dt,players){if(this.status!=='playing')return;for(let i=0;i<this.games.length;i++)this.games[i].tick(dt,i===0);if(this.bot&&players&&this.status==='playing')this.bot.update(this.games[1],players[1],dt);}
+  tick(dt,players){if(this.status!=='playing')return;for(let i=0;i<this.games.length;i++)this.games[i].tick(dt,i===0);if(this.bot&&players&&this.status==='playing')this.bot.update(this.games[1],players[1],dt,players.filter((p,i)=>i!==1&&p.active!==false));}
   gameFor(index){return this.games[this.competitive?index:0]}
   get result(){if(!this.competitive)return null;const [a,b]=this.games;return{winner:a.score===b.score?null:a.score>b.score?0:1,scores:[a.score,b.score],served:[a.served,b.served]}}
 }

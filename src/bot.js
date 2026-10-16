@@ -1,5 +1,6 @@
 import { RECIPES, INGREDIENTS, matchAssembly, matchRecipe } from './engine.js';
-import { createNavigator, nearestStation, collides, speedMultiplier } from './navigation.js';
+import {moveChef, recoverChef} from './movement.js';
+import { createNavigator, nearestStation, speedMultiplier } from './navigation.js';
 export const BOT_DIFFICULTIES={easy:{name:'Tập sự',speed:2.7,delay:.4},normal:{name:'Đầu bếp',speed:3.2,delay:.18},hard:{name:'Bếp trưởng',speed:3.8,delay:.04}};
 export class ChefBot{
   constructor(stations,map,difficulty='normal'){this.stations=stations.filter(s=>s.team===undefined||s.team===1);this.map=map;this.settings=BOT_DIFFICULTIES[difficulty]||BOT_DIFFICULTIES.normal;this.navigator=createNavigator(this.stations);this.path=[];this.targetId=null;this.wait=0;this.recipe=null;this.label='Đang chọn món';}
@@ -43,8 +44,9 @@ export class ChefBot{
     if(!next)return task('grill',false,'Chờ thịt nướng');
     const ingredient=next.split(':')[1];return source(ingredient);
   }
-  update(game,p,dt){
+  update(game,p,dt,others=[]){
     p.moving=false;p.work=false;if(game.status!=='playing')return;
+    recoverChef(p,this.stations,others);this.repathWait=Math.max(0,(this.repathWait||0)-dt);
     this.wait=Math.max(0,this.wait-dt);const task=this.choose(game,p);this.label=task.label;if(!task.station)return;
     if(nearestStation(p,this.stations)?.id===task.station.id&&Math.hypot(p.x-task.station.x,p.z-task.station.z)<1.55){
       this.targetId=null;this.path=[];p.dir=Math.atan2(task.station.x-p.x,task.station.z-p.z);
@@ -53,8 +55,8 @@ export class ChefBot{
       if(task.station.kind==='grill'&&!p.item&&game.grill.item&&!game.grill.ready)return;
       if(this.wait===0){const discardedMeal=task.station.kind==='trash'&&p.item?.kind==='meal';if(game.action(p,task.station)&&discardedMeal)this.recipe=null;this.wait=this.settings.delay;}return;
     }
-    if(this.targetId!==task.station.id||!this.path.length){this.targetId=task.station.id;this.path=this.navigator.pathTo(p,task.station)||[];if(!this.path.length)return;}
+    if(this.targetId!==task.station.id||!this.path.length){this.targetId=task.station.id;if(this.repathWait>0)return;this.path=this.navigator.pathTo(p,task.station,others)||[];this.repathWait=.3;if(!this.path.length){this.label='Chờ lối trống';return;}}
     let distance=this.settings.speed*speedMultiplier(p,this.map)*dt;
-    while(distance>0&&this.path.length){const waypoint=this.path[0],dx=waypoint.x-p.x,dz=waypoint.z-p.z,length=Math.hypot(dx,dz);if(length<.015){this.path.shift();continue}const amount=Math.min(length,distance),x=p.x+dx/length*amount,z=p.z+dz/length*amount;if(collides(x,z,this.stations)){this.path=[];break}p.dir=Math.atan2(dx,dz);p.x=x;p.z=z;p.moving=true;distance-=amount;if(amount===length)this.path.shift();}
+    while(distance>0&&this.path.length){const waypoint=this.path[0],dx=waypoint.x-p.x,dz=waypoint.z-p.z,length=Math.hypot(dx,dz);if(length<.015){this.path.shift();continue}const amount=Math.min(length,distance),moved=moveChef(p,dx/length*amount,dz/length*amount,this.stations,others);p.dir=Math.atan2(dx,dz);p.moving ||= moved.distance>1e-5;distance-=amount;if(moved.hitChef||moved.hitWall){this.path=[];this.label='Đang tìm đường vòng';break}if(amount===length)this.path.shift();}
   }
 }
