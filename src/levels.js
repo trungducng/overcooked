@@ -7,7 +7,7 @@ export const MODES = {
   bot: { name: 'Đấu với bot', icon: '✦', description: 'So tài ngay trong cùng bếp. Dụng cụ và nguyên liệu dùng chung.' },
 };
 export const MAPS = [
-  { id: 'sunny', name: 'Căn bếp ban mai', short: 'SUNNY SIDE', icon: '☀', subtitle: 'Vườn nhỏ, lối đi vòng quanh đảo bếp.', background: '#dce4d5', floor: [0xeee2c5, 0x709c8c], wall: 0xe8c184, cabinet: 0x28745d, accent: '#789a83', hazard: [], spawn: [{x:0,z:1.6},{x:-3,z:1.6}] },
+  { id: 'sunny', name: 'Đại sảnh Ánh Lửa', short: 'LANTERN HALL', icon: '✦', subtitle: 'Đại tiệc trên vực ngọc. Chung bếp, chung cuộc vui.', background: '#dce4d5', floor: [0xeee2c5, 0x709c8c], wall: 0xe8c184, cabinet: 0x514356, accent: '#789a83', hazard: [], spawn: [{x:0,z:1.6},{x:-3,z:1.6}] },
   { id: 'harbor', name: 'Bến cảng gió lộng', short: 'HARBOR KITCHEN', icon: '⚓', subtitle: 'Lối giữa thông thoáng. Cẩn thận sàn ướt!', background: '#cbdfe2', floor: [0xede3c9, 0x679bab], wall: 0xb3cfd1, cabinet: 0x306f94, accent: '#678ca4', hazard: [{x:0,z:0,rx:.85,rz:1.1}], spawn: [{x:0,z:1.5},{x:-3.8,z:1.5}] },
   { id: 'market', name: 'Chợ đêm đèn lồng', short: 'LANTERN MARKET', icon: '☾', subtitle: 'Bếp đổi phía, đảo lệch và lối đi zích zắc.', background: '#cec1d0', floor: [0xefdbb4, 0xa66d78], wall: 0xd39e88, cabinet: 0x93475d, accent: '#9e737d', hazard: [], spawn: [{x:0,z:-1.6},{x:3.8,z:1.5}] },
 ];

@@ -10,6 +10,10 @@ Mỗi mốc có 10 ca nghiệm thu, mỗi ca 10 điểm; đạt tối thiểu 9/
 
 Toàn bộ game chỉ được nhận mức 90% trong phạm vi đã thống nhất khi tổng điểm theo trọng số bên dưới ≥90%, mọi mốc lõi M0–M7 đạt cổng, và đã chơi trọn các màn đại diện ở solo, co-op, PvP và bot. Hiện **chưa đánh giá tổng mức tương đồng**; còn nhiều cơ chế chưa làm.
 
+## Điều chỉnh ưu tiên hình ảnh
+
+Theo phản hồi ngày 16/10/2026, thực hiện V1 — Đại sảnh Ánh Lửa trước M2: khung chơi toàn viewport, camera, dựng cảnh, vật liệu, ánh sáng, nhân vật và HUD. Xem `docs/milestones/V1-lantern-hall.md`. Không chờ tới M10 mới làm nền tảng hình ảnh; M10 giữ phần hoàn thiện âm thanh/animation và hiệu năng. Không lấy điểm nghiệm thu kỹ thuật để chấm độ giống hình ảnh.
+
 ## Thứ tự triển khai
 
 | Mốc | Trọng số | Phần việc và kết quả cần có | Cổng nghiệm thu lõi | Trạng thái |

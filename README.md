@@ -79,3 +79,7 @@ Xem [kế hoạch triển khai tuần tự](docs/implementation-plan.md). Mỗi 
 ## M1 — Di chuyển và lướt
 
 Các đầu bếp chặn và lách qua nhau trong bếp chung. Di chuyển được chia thành bước nhỏ để cú lướt không xuyên quầy/người; đi chéo vẫn trượt dọc mép quầy. Shift trái/phải lướt theo hướng đi (hoặc hướng nhìn khi đứng yên), có hồi chiêu 1,1 giây; chỉ báo nằm ở hàng điều khiển. Màn hình nhỏ có thêm nút LƯỚT. Pause hủy cú lướt và đóng băng hồi chiêu; reset xóa vận tốc. Bot tìm đường tránh người và lập lại đường khi bị chắn. Xem [nghiệm thu M1](docs/milestones/M1-movement.md).
+
+## V1 — Đại sảnh Ánh Lửa
+
+Màn chơi nay phủ viewport với HUD gọn ở góc. Môi trường đá nổi, tường vòm, đuốc cam, vực/cổng sáng xanh và khu khách đều dựng bằng 3D, có ánh sáng/bóng đổ và hậu kỳ. Camera mới nhìn thẳng nên WASD/mũi tên đi đúng trục màn hình. Cổng và khu vực ngoài rìa hiện là cảnh trí. Xem [chi tiết bản hình ảnh](docs/milestones/V1-lantern-hall.md).

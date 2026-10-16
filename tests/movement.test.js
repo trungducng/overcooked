@@ -43,3 +43,4 @@ test('Reset clears dash momentum and cooldown',()=>{const p=chef();requestDash(p
 
 for(const map of MAPS)test(`${map.id}: stations have distinct physical locations`,()=>{const stations=getStations(map.id);assert.equal(new Set(stations.map(s=>`${s.x}:${s.z}`)).size,stations.length)});
 test('Pausing cancels queued dash without advancing cooldown or positions',()=>{const p=chef();p.dashRequested=true;requestDash(p);const cooldown=p.cooldown;stopDash(p);assert.equal(p.dashRequested,false);assert.equal(p.dash,0);assert.equal(p.cooldown,cooldown);close(p.x,0);});
+test('Overhead camera controls move along the matching screen axes without sideways drift',()=>{for(const [input,x,z] of [[{x:1,z:0},.76,0],[{x:-1,z:0},-.76,0],[{x:0,z:1},0,.76],[{x:0,z:-1},0,-.76]]){const p=chef();stepChef(p,input,.2,[],plain);close(p.x,x);close(p.z,z)}});

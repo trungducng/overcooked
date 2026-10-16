@@ -72,9 +72,8 @@ export function requestDash(p,input={x:0,z:0}) {
 export function screenDirection(x,z) {
   const length=Math.hypot(x,z);
   if(!length)return {x:0,z:0};
-  // Match the fixed isometric camera. Normalize the basis as well as the input.
-  const basis=Math.hypot(.868,.496);
-  return {x:(x*.868+z*.496)/length/basis,z:(-x*.496+z*.868)/length/basis};
+  // The new overhead camera looks straight along Z; screen axes match the floor.
+  return {x:x/length,z:z/length};
 }
 export function stepChef(p,input,dt,stations,map,others=[]) {
   const direction=screenDirection(input.x,input.z);
