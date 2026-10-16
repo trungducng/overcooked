@@ -118,6 +118,7 @@ function pollInputs(){const pads=navigator.getGamepads?.()||[];for(let i=0;i<4;i
 window.addEventListener('gamepaddisconnected',e=>{frameInputs[e.gamepad.index]=null;padPrevious[e.gamepad.index]={};if(players[e.gamepad.index]?.active&&match.status==='playing'){showPause();toast('Tay cầm ngắt kết nối. Có thể cắm lại hoặc dùng bàn phím.')}});
 function interact(i){if(isGuest()){network.command('interact');return}if(match.status!=='playing'||botSeat(i))return;if(i===0)i=controlledChef;const p=players[i];if(handling.handoff(p,players)||handling.pickup(p)){sound(580,.08);updateHud();return}const s=nearest(p);if(s){p.dir=Math.atan2(s.x-p.x,s.z-p.z);if(gameFor(i).action(p,s))sound(420,.07)}else toast('Đến gần một quầy bếp để tương tác.');processEvents();updateHud();}
 function keydown(e){
+ if(e.code==='Enter'&&e.target instanceof HTMLButtonElement&&e.target.closest('#network-bar'))return;
  const input=e.target instanceof HTMLSelectElement||e.target instanceof HTMLInputElement;if(input)return;
  if(['Space','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight','Numpad0','Slash'].includes(e.code)&&match.status==='playing')e.preventDefault();
  if(e.code==='Enter'&&coop&&!match.bot&&match.status==='playing')e.preventDefault();
