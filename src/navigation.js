@@ -1,4 +1,4 @@
-export const BOUNDS={minX:-5.9,maxX:5.94,minZ:-3.98,maxZ:4.02};
+export const BOUNDS={minX:-7.5,maxX:7.5,minZ:-5.55,maxZ:5.55};
 export function collides(x,z,stations){
   if(x<BOUNDS.minX||x>BOUNDS.maxX||z<BOUNDS.minZ||z>BOUNDS.maxZ)return true;
   return stations.some(s=>Math.abs(x-s.x)<(s.kind==='trash'?.53:1.13)+.23&&Math.abs(z-s.z)<(s.kind==='trash'?.53:.76)+.23);
@@ -9,8 +9,8 @@ export function nearestStation(p,stations){
 export function speedMultiplier(p,map){return map.hazard.some(h=>((p.x-h.x)/h.rx)**2+((p.z-h.z)/h.rz)**2<1)?.58:1;}
 // Four-way navigation avoids corner cutting. Both bot and humans use collides().
 export function createNavigator(stations){
-  const step=.24,nx=50,nz=34,cells=new Map();
-  for(let ix=0;ix<nx;ix++)for(let iz=0;iz<nz;iz++){const x=-5.82+ix*step,z=-3.9+iz*step;if(!collides(x,z,stations))cells.set(ix*nz+iz,{id:ix*nz+iz,ix,iz,x,z});}
+  const step=.24,nx=63,nz=47,cells=new Map();
+  for(let ix=0;ix<nx;ix++)for(let iz=0;iz<nz;iz++){const x=-7.44+ix*step,z=-5.52+iz*step;if(!collides(x,z,stations))cells.set(ix*nz+iz,{id:ix*nz+iz,ix,iz,x,z});}
   function pathTo(p,station){
     if(nearestStation(p,stations)?.id===station.id&&Math.hypot(p.x-station.x,p.z-station.z)<1.53)return [];
     const visible=(a,b)=>{const n=Math.ceil(Math.hypot(a.x-b.x,a.z-b.z)/.07);for(let i=1;i<=n;i++)if(collides(a.x+(b.x-a.x)*i/n,a.z+(b.z-a.z)*i/n,stations))return false;return true};

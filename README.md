@@ -1,4 +1,4 @@
-# Kitchen Rush · phiên bản 2
+# Kitchen Rush · phiên bản 3
 
 Game nấu ăn 3D độc lập, dùng Three.js để tạo hình căn bếp, nguyên liệu và đầu bếp. Không dùng tài nguyên của Overcooked.
 
@@ -17,10 +17,10 @@ Vite in URL bản chơi; `dist/` là bản build tĩnh. Các kiểm tra bao gồ
 
 - **Một mình:** săn ba sao trên từng màn.
 - **Đồng đội:** hai người dùng chung thớt, nồi, đơn hàng, đĩa và điểm.
-- **Đấu tay đôi (PvP):** hai người cùng máy, cùng bàn phím. Người 1 dùng thớt/nồi cam, người 2 dùng thớt/nồi xanh.
+- **Đấu tay đôi (PvP):** hai người cùng máy, cùng bàn phím. Mỗi bên có một căn bếp đầy đủ, tách biệt, camera riêng.
 - **Đấu với bot:** bot dùng quầy xanh và tự tìm đường, lấy nguyên liệu, thái, nấu, lấy đĩa, giao món, rửa đĩa và dập lửa. Có Tập sự, Đầu bếp và Bếp trưởng; khác tốc độ đi và thời gian phản ứng, cùng luật nấu/điểm với người.
 
-PvP và đấu bot dùng cùng thời gian trận và cùng chuỗi công thức. Mỗi bên có điểm, combo, đơn đang chờ, nồi, thớt và số đĩa riêng. Bỏ lỡ đơn bị trừ 20đ; điểm không xuống dưới 0. Điểm cao hơn khi hết giờ thắng; bằng điểm là hòa. Nguyên liệu và các bàn trống là không gian dùng chung. Hai nút ở danh sách đơn cho phép xem đơn từng bên. Chưa có chơi mạng giữa các máy.
+PvP và đấu bot dùng cùng thời gian trận và cùng chuỗi công thức. Mỗi bên có điểm, combo, đơn đang chờ, nồi, thớt và số đĩa riêng. Bỏ lỡ đơn bị trừ 20đ; điểm không xuống dưới 0. Điểm cao hơn khi hết giờ thắng; bằng điểm là hòa. Kho nguyên liệu, bàn trống, chảo, bàn ráp, đĩa và bồn rửa đều tách riêng giữa hai bếp. Hai nút ở danh sách đơn cho phép xem đơn từng bên. Chưa có chơi mạng giữa các máy.
 
 ## Ba bản đồ, chín màn
 
@@ -49,7 +49,15 @@ ESC tạm dừng cả hai đội, các nồi và bot. Mất tiêu điểm cửa 
 
 Cách nấu: lấy nguyên liệu → đặt lên thớt → giữ phím thao tác → lấy nguyên liệu đã thái → cho hai phần đúng công thức vào nồi → chờ chín → lấy đĩa → múc súp → giao món. Tay không để rửa đĩa hoặc dập lửa. Có thể đặt đồ lên bàn trống và bỏ vào thùng rác khi cần.
 
-Bốn công thức: 2 cà chua, 2 hành tây, 2 nấm, hoặc 1 cà chua + 1 nấm. Công thức hiển thị trên đơn.
+Sáu công thức thuộc ba quy trình:
+
+- **Súp:** 2 cà chua / 2 hành / 2 nấm / 1 cà chua + 1 nấm; thái → nấu → múc đĩa.
+- **Salad:** đặt đĩa lên bàn ráp, thêm xà lách và cà chua đã thái; E tay không lấy món.
+- **Burger:** thái thịt bò → nướng chảo 7 giây; ráp trên đĩa với bánh mì và cà chua đã thái. Thịt để trên chảo 25 giây sẽ cháy; tay không giữ Space dập lửa.
+
+Có nút **Công thức** để xem sổ tay, và đường chế biến hiện trên mỗi đơn. Level trộn các loại món để người chơi phân công và làm song song. Giao đơn đầu danh sách tăng combo 20% mỗi bước, tối đa ×2; giao sai thứ tự hoặc bỏ lỡ đơn mất chuỗi. Cứ mỗi 45 giây có cao điểm 12 giây, thêm 25% điểm phục vụ.
+
+Sàn mở rộng 25% theo chiều ngang và 40% theo chiều sâu (diện tích tăng 75%). Thi đấu dùng hai bếp độc lập với cùng bố trí và thời gian; trên desktop hai bếp cạnh nhau, màn hình nhỏ xếp dọc. [Nghiên cứu thiết kế](docs/design-research.md) ghi rõ nguồn tham khảo và phạm vi đã làm.
 
 ## Mã nguồn
 

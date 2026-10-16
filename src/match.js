@@ -1,5 +1,5 @@
 import {KitchenGame} from './engine.js';
-import {MAPS,LEVELS,getMap,getStations,isVersus,MODES} from './levels.js';
+import {MAPS,LEVELS,getMap,getStations,isVersus,MODES,stationsForTeam} from './levels.js';
 import {ChefBot} from './bot.js';
 export class KitchenMatch {
   constructor(options={}){
@@ -10,8 +10,7 @@ export class KitchenMatch {
     this.competitive=isVersus(this.options.mode);this.stations=getStations(this.map.id,this.competitive);
     const config={...this.level,recipeOffset:this.level.recipeOffset+MAPS.indexOf(this.map)};
     this.games=Array.from({length:this.competitive?2:1},()=>new KitchenGame(config));
-    if(this.competitive)this.games[1].counters=this.games[0].counters;
-    this.bot=this.options.mode==='bot'?new ChefBot(this.stations,this.map,this.options.difficulty):null;
+    this.bot=this.options.mode==='bot'?new ChefBot(stationsForTeam(this.stations,1),this.map,this.options.difficulty):null;
   }
   get status(){return this.games[0].status}
   set status(value){for(const game of this.games)game.status=value}
