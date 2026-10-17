@@ -54,6 +54,7 @@ export function stageStations(stage,competitive=false){
  if(stage.belt||stage.moving){at('bun',-6.5,2.2);at('grill',6.5,2.2);}
  if(stage.gate){const divided=stage.layout==='gates';stations.push({id:'gate',kind:'obstacle',x:0,z:divided?3.9:2.3,width:divided?.65:2.2,depth:divided?3.7:.35,enabled:false,dynamic:true});if(divided)stations.push({id:'gate-alt',kind:'obstacle',x:0,z:-3.9,width:.65,depth:3.7,enabled:false,dynamic:true,phaseOffset:8});}
  if(stage.sushi){
+  stations.unshift({id:'sushi-belt-base',kind:'obstacle',x:0,z:.9,width:7.9,depth:3.3,collisionOnly:true});
   for(const [id,ingredient] of Object.entries({tomato:'fish',onion:'rice',mushroom:'cucumber',bun:'nori'}))stations.find(s=>s.id===id).ingredient=ingredient;
   const loop=stations.filter(s=>s.belt).sort((a,b)=>a.x-b.x);loop.forEach((s,i)=>s.beltIndex=i);
   for(const [i,x] of [2.8,0,-2.8].entries())stations.push({id:'belt'+(i+3),kind:'counter',x,z:1.8,belt:true,beltIndex:i+3});

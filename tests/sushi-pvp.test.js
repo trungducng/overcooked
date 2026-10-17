@@ -1,4 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';
+import {moveChef} from '../src/movement.js';
+import {collides} from '../src/navigation.js';
 import {KitchenMatch} from '../src/match.js';import {RECIPES} from '../src/engine.js';import {ItemHandling} from '../src/handling.js';import {snapshot,applySnapshot} from '../src/sync.js';
 const station=(m,kind)=>m.stations.find(s=>s.kind===kind);
 const crew=m=>m.map.spawn.map((s,id)=>({...s,id,team:m.competitive?id%2:0,active:id<2||m.bots.has(id),item:null}));
@@ -13,3 +15,5 @@ test('reservations and PvP bots survive repeated online snapshots without duplic
 test('both PvP bots finish orders in the same shared kitchen without taking each other’s reserved work',()=>{const m=new KitchenMatch({mode:'pvp',pvpBots:'both'}),p=crew(m);p[0].active=p[1].active=false;m.start();for(let t=0;t<m.level.duration;t+=.05){m.tick(.05,p);m.games.forEach(g=>g.events=[])}for(const g of m.games)assert.ok(g.served>=2)});
 
 test('every sushi loop seat reaches service across both directions and all reversal phases',()=>{for(let phase=0;phase<72;phase+=6)for(let slot=0;slot<6;slot++){const m=new KitchenMatch({map:'harbor',level:1});m.start();m.games[0].orders.forEach(o=>o.time=o.total=1000);m.tick(phase);const p={id:0,team:0,item:{kind:'meal',recipe:m.games[0].orders[0].recipe}};m.games[0].action(p,m.stations.find(s=>s.beltIndex===slot));for(let i=0;i<72&&!m.games[0].served;i++)m.tick(1);assert.equal(m.games[0].served,1,`phase ${phase} slot ${slot}`)}});
+
+test('the sushi island blocks walking and a swept dash through every visual join',()=>{const m=new KitchenMatch({map:'harbor',level:1});for(const x of [-1.4,1.4]){const p={x,z:-2};moveChef(p,0,6,m.stations);assert.ok(p.z<-.9,`chef crossed upper seam ${x}`);const q={x,z:3.1};moveChef(q,0,-6,m.stations);assert.ok(q.z>2.7,`chef crossed lower seam ${x}`)}for(const sign of [-1,1]){const p={x:sign*4.5,z:.9};moveChef(p,-sign*10,0,m.stations);assert.ok(sign*p.x>4.1,'chef crossed side joint')}for(const x of [-1.4,1.4])for(const z of [0,.9,1.8])assert.ok(collides(x,z,m.stations));});
