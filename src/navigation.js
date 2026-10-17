@@ -2,7 +2,8 @@
 const PEER_CLEARANCE=.74;
 export const BOUNDS={minX:-7.5,maxX:7.5,minZ:-5.55,maxZ:5.55};
 export function collides(x,z,stations){
-  if(x<BOUNDS.minX||x>BOUNDS.maxX||z<BOUNDS.minZ||z>BOUNDS.maxZ)return true;
+  const bounds=stations.bounds||BOUNDS;
+  if(x<bounds.minX||x>bounds.maxX||z<bounds.minZ||z>bounds.maxZ)return true;
   return stations.some(s=>s.enabled!==false&&Math.abs(x-s.x)<(s.width!==undefined?s.width/2:s.kind==='trash'?.53:1.13)+.23&&Math.abs(z-s.z)<(s.depth!==undefined?s.depth/2:s.kind==='trash'?.53:.76)+.23);
 }
 export function nearestStation(p,stations){
@@ -11,8 +12,8 @@ export function nearestStation(p,stations){
 export function speedMultiplier(p,map){const hits=[...(map.hazard||[]),...(map.dynamicHazards||[])].filter(h=>((p.x-h.x)/h.rx)**2+((p.z-h.z)/h.rz)**2<1);return hits.length?Math.min(...hits.map(h=>h.multiplier??.58)):1;}
 // Four-way navigation avoids corner cutting. Both bot and humans use collides().
 export function createNavigator(stations){
-  const step=.24,nx=63,nz=47,cells=new Map();
-  for(let ix=0;ix<nx;ix++)for(let iz=0;iz<nz;iz++){const x=-7.44+ix*step,z=-5.52+iz*step;if(!collides(x,z,stations))cells.set(ix*nz+iz,{id:ix*nz+iz,ix,iz,x,z});}
+  const step=.24,bounds=stations.bounds||BOUNDS,startX=Math.ceil(bounds.minX/step)*step,startZ=Math.ceil(bounds.minZ/step)*step,nx=Math.floor((bounds.maxX-startX)/step)+1,nz=Math.floor((bounds.maxZ-startZ)/step)+1,cells=new Map();
+  for(let ix=0;ix<nx;ix++)for(let iz=0;iz<nz;iz++){const x=startX+ix*step,z=startZ+iz*step;if(!collides(x,z,stations))cells.set(ix*nz+iz,{id:ix*nz+iz,ix,iz,x,z});}
   function pathTo(p,station,others=[]){
     const blocked=(x,z)=>collides(x,z,stations)||others.some(other=>other!==p&&other.active!==false&&Math.hypot(x-other.x,z-other.z)<PEER_CLEARANCE);
     if(nearestStation(p,stations)?.id===station.id&&Math.hypot(p.x-station.x,p.z-station.z)<1.53)return [];

@@ -10,6 +10,7 @@ const definitions=[
  {name:'Chợ đêm zigzag',lesson:'Quầy sơ chế và giao ở hai đầu mê cung; chuyền nguyên liệu để tiết kiệm đường',menu:['forest','mushsalad','greenburger','onionburger'],goals:[140,320,560],layout:'market'},
  {name:'Đảo bếp chuyển động',lesson:'Xe chở đồ qua đường ray: nhận đúng món khi xe đến',menu:['onionburger','forest','mushroom'],goals:[150,340,590],layout:'moving',moving:true},
  {name:'Ca làm bão lửa',lesson:'Hơi nước phun theo chu kỳ, băng chuyền đảo chiều và cháy lan',menu:['onionburger','garden','forest','onion'],goals:[170,380,650],layout:'finale',belt:true,reverse:true,gate:true,wet:true,vents:true},
+ {name:'Buffet vòng quanh',lesson:'Đầu bếp trong bếp giữa · đặt món lên vòng ngoài · khách ngồi quanh quầy',layout:'buffet',buffet:true,sushi:true,belt:true,beltInterval:3,reverse:false,duration:300,patience:180,menu:['nigiri','kappamaki','salmonmaki','futomaki','salmonbowl','beefbowl'],goals:[160,450,800]},
 ];
 export const STAGE_STYLES=[
  {accent:'#e7b96e',floor:0xd7b777,secondary:0x8e9c74,icon:'♨',mechanic:'Bếp truyền thống'},
@@ -21,10 +22,11 @@ export const STAGE_STYLES=[
  {accent:'#ec8ca5',floor:0xd3ad96,secondary:0x926574,icon:'☾',mechanic:'Chợ zigzag'},
  {accent:'#b5a3e7',floor:0xb4a6d0,secondary:0x6c719b,icon:'↔',mechanic:'Xe chuyển đồ'},
  {accent:'#f49762',floor:0xc9a27d,secondary:0x8f635e,icon:'♨',mechanic:'Hơi nước áp lực'},
+ {accent:'#e8ad78',floor:0xe1c7a1,secondary:0xb49877,icon:'🍣',mechanic:'Buffet · bếp giữa, khách bên ngoài'},
 ];
-export const STAGES=definitions.map((d,i)=>({...LEVELS[i%3],...d,style:STAGE_STYLES[i],id:i,map:MAPS[Math.floor(i/3)].id,level:i%3}));
+export const STAGES=definitions.map((d,i)=>({...LEVELS[i%3],...d,style:STAGE_STYLES[i],id:i,map:i===9?'market':MAPS[Math.floor(i/3)].id,level:i===9?3:i%3}));
 export function getStage(map,level=0){return STAGES.find(s=>s.map===map&&s.level===level)||STAGES[0]}
-export function stageMap(stage){const map=getMap(stage.map);return {...map,stageId:stage.id,sushi:stage.sushi,moving:stage.moving,dynamicHazards:[],hazard:stage.wet?(stage.layout==='lanes'?[{x:0,z:0,rx:2.8,rz:.6},{x:-6.2,z:-2,rx:.6,rz:1.2},{x:6.2,z:2,rx:.6,rz:1.2}]:stage.layout==='gates'?[{x:-3.8,z:0,rx:1.2,rz:.7},{x:3.8,z:0,rx:1.2,rz:.7}]:[{x:0,z:2.1,rx:2.2,rz:.65}]):[],spawn:stage.sushi?[{x:-4.5,z:1.8},{x:4.5,z:1.8},{x:-4.5,z:-2},{x:4.5,z:-2}]:stage.layout==='lanes'?[{x:-3.8,z:.9},{x:3.8,z:-.9},{x:-3.8,z:-.9},{x:3.8,z:.9}]:stage.roles?[{x:-3.8,z:2},{x:3.8,z:2},{x:-3.8,z:-2.8},{x:3.8,z:-2.8}]:[{x:-3.8,z:2},{x:3.8,z:2},{x:-3.8,z:-2},{x:3.8,z:-2}]}}
+export function stageMap(stage){const map=getMap(stage.map);return {...map,...(stage.buffet?{name:'Nhà hàng sushi',short:'SUSHI BUFFET',icon:'🍣',subtitle:'Bếp giữa, vòng phục vụ ngoài, khách ngồi quanh quầy.'}:{}),stageId:stage.id,sushi:stage.sushi,buffet:stage.buffet,moving:stage.moving,dynamicHazards:[],hazard:stage.wet?(stage.layout==='lanes'?[{x:0,z:0,rx:2.8,rz:.6},{x:-6.2,z:-2,rx:.6,rz:1.2},{x:6.2,z:2,rx:.6,rz:1.2}]:stage.layout==='gates'?[{x:-3.8,z:0,rx:1.2,rz:.7},{x:3.8,z:0,rx:1.2,rz:.7}]:[{x:0,z:2.1,rx:2.2,rz:.65}]):[],spawn:stage.buffet?[{x:-3.8,z:0},{x:3.8,z:0},{x:-3.8,z:-4.2},{x:3.8,z:4.2}]:stage.sushi?[{x:-4.5,z:1.8},{x:4.5,z:1.8},{x:-4.5,z:-2},{x:4.5,z:-2}]:stage.layout==='lanes'?[{x:-3.8,z:.9},{x:3.8,z:-.9},{x:-3.8,z:-.9},{x:3.8,z:.9}]:stage.roles?[{x:-3.8,z:2},{x:3.8,z:2},{x:-3.8,z:-2.8},{x:3.8,z:-2.8}]:[{x:-3.8,z:2},{x:3.8,z:2},{x:-3.8,z:-2},{x:3.8,z:-2}]}}
 export function stageStations(stage,competitive=false){
  const stations=getStations(stage.map,competitive),at=(id,x,z)=>Object.assign(stations.find(s=>s.id===id),{x,z});
  if(stage.layout==='relay'){
@@ -53,16 +55,24 @@ export function stageStations(stage,competitive=false){
  if(stage.moving){at('counter1',0,0);at('lettuce',-5.6,0);at('beef',5.6,0);}
  if(stage.belt||stage.moving){at('bun',-6.5,2.2);at('grill',6.5,2.2);}
  if(stage.gate){const divided=stage.layout==='gates';stations.push({id:'gate',kind:'obstacle',x:0,z:divided?3.9:2.3,width:divided?.65:2.2,depth:divided?3.7:.35,enabled:false,dynamic:true});if(divided)stations.push({id:'gate-alt',kind:'obstacle',x:0,z:-3.9,width:.65,depth:3.7,enabled:false,dynamic:true,phaseOffset:8});}
- if(stage.sushi){
+ if(stage.sushi&&!stage.buffet){
   stations.unshift({id:'sushi-belt-base',kind:'obstacle',x:0,z:.9,width:7.9,depth:3.3,collisionOnly:true});
   for(const [id,ingredient] of Object.entries({tomato:'fish',onion:'rice',mushroom:'cucumber',bun:'nori'}))stations.find(s=>s.id===id).ingredient=ingredient;
   const loop=stations.filter(s=>s.belt).sort((a,b)=>a.x-b.x);loop.forEach((s,i)=>s.beltIndex=i);
   for(const [i,x] of [2.8,0,-2.8].entries())stations.push({id:'belt'+(i+3),kind:'counter',x,z:1.8,belt:true,beltIndex:i+3});
  }
+ if(stage.buffet){
+  for(let i=stations.length-1;i>=0;i--)if(stations[i].belt||stations[i].dynamic||stations[i].kind==='obstacle')stations.splice(i,1);
+  layout({tomato:[-5.6,-2.2],onion:[-2.8,-2.2],mushroom:[0,-2.2],bun:[2.8,-2.2],beef:[5.6,-2.2],sink:[-5.6,2.2],plates:[-2.8,2.2],assembly:[0,2.2],board:[2.8,2.2],grill:[5.6,2.2],pot:[0,0],lettuce:[-7.5,-3.8],trash:[7.5,-3.8],serve:[7.5,3.8]});
+  for(const [id,ingredient] of Object.entries({tomato:'fish',onion:'rice',mushroom:'cucumber',bun:'nori'}))stations.find(s=>s.id===id).ingredient=ingredient;
+  const ring=[[-8.4,-6.2],[-4.2,-6.2],[0,-6.2],[4.2,-6.2],[8.4,-6.2],[10.5,0],[8.4,6.2],[4.2,6.2],[0,6.2],[-4.2,6.2],[-8.4,6.2],[-10.5,0]];
+  ring.forEach(([x,z],i)=>stations.push({id:'buffet-belt'+i,kind:'counter',x,z,belt:true,beltIndex:i}));
+  stations.bounds={minX:-9.2,maxX:9.2,minZ:-5.1,maxZ:5.1};
+ }
  return stations;
 }
 export function isStageUnlocked(stage,records,mode='solo'){
- if(stage.id===0)return true;
+ if(stage.id===0||stage.buffet)return true;
  // Cooperative/competitive records also contribute to campaign access.
  return STAGES.slice(0,stage.id).every(s=>Object.entries(records).some(([key,r])=>key.endsWith(`:${s.map}:${s.level}`)&&Number(r.stars)>=1));
 }

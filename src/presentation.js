@@ -136,7 +136,7 @@ export function createPresentation(scene,renderer,camera){
  const dustGeo=new THREE.BufferGeometry();dustGeo.setAttribute('position',new THREE.BufferAttribute(points,3));const dust=new THREE.Points(dustGeo,new THREE.PointsMaterial({color:0x90ffe1,map:glowMap,size:.14,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending}));environment.add(dust);
  // Wet patches retain exactly the physical positions defined by each map.
  const puddles=new THREE.Group();scene.add(puddles);const alternateSets=createAlternateSets(scene,batchStatic);
- function setTheme(map,stage){environment.visible=map.id==='sunny';alternateSets.setTheme(map.id,stage);tiles.material.color.set(stage?.style.floor??0xc4c8d5);
+ function setTheme(map,stage){environment.visible=map.id==='sunny'&&!stage?.buffet;alternateSets.setTheme(stage?.buffet?'buffet':map.id,stage);tiles.material.color.set(stage?.style.floor??0xc4c8d5);
   scene.background.set(map.id==='market'?0x121026:0x0c1830);scene.fog.color.copy(scene.background);
   const tint=map.id==='market'?0x50415e:map.id==='harbor'?0x33536d:0x444660;darkStone.color.set(tint);mistMaterial.uniforms.tint.value.set(map.id==='market'?0x5360d5:0x00d8bd);
   for(const child of [...puddles.children]){puddles.remove(child);child.geometry.dispose();child.material.dispose();}

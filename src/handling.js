@@ -32,7 +32,7 @@ export class ItemHandling {
   const dx=Math.sin(p.dir||0),dz=Math.cos(p.dir||0);
   this.items.push({id:++this.sequence,item:p.item,x:p.x,z:p.z,y:1,flight:{x:p.x,z:p.z,dx,dz,time:0,duration:.65,range:5,owner:p.id??p}});p.item=null;this.events.push('throw');return true;
  }
- tick(dt,players){
+ tick(dt,players){const bounds=this.stations.bounds||BOUNDS;
   for(const entity of [...this.items]){
    const f=entity.flight;if(!f)continue;
    let remaining=dt;
@@ -40,7 +40,7 @@ export class ItemHandling {
     const slice=Math.min(.012,remaining);remaining-=slice;f.time=Math.min(f.duration,f.time+slice);const t=f.time/f.duration;
     const x=f.x+f.dx*f.range*t,z=f.z+f.dz*f.range*t;
     const wall=this.stations.some(s=>s.kind==='obstacle'&&s.enabled!==false&&Math.abs(x-s.x)<(s.width??2.26)/2+.15&&Math.abs(z-s.z)<(s.depth??1.52)/2+.15);
-    if(x<BOUNDS.minX||x>BOUNDS.maxX||z<BOUNDS.minZ||z>BOUNDS.maxZ||wall){this.land(entity);break;}
+    if(x<bounds.minX||x>bounds.maxX||z<bounds.minZ||z>bounds.maxZ||wall){this.land(entity);break;}
     entity.x=x;entity.z=z;entity.y=.4+Math.sin(Math.PI*t)*1.75;
     const catcher=players.find(p=>p.active!==false&&(p.id??p)!==f.owner&&!p.item&&distance(p,entity)<.52);
     if(catcher){catcher.item=entity.item;this.items.splice(this.items.indexOf(entity),1);entity.flight=null;this.events.push('catch');break;}

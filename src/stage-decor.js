@@ -9,13 +9,24 @@ export function createStageDecor(scene,batch){
   // Coloured work zones and inset runners communicate the route without labels.
   const style=stage.style,accent=new THREE.Color(style.accent);panel(0,0,15.8,11.3,style.floor,.08);
   for(const s of stations){if(['board','pot','grill','serve','assembly'].includes(s.kind))panel(s.x,s.z,2.45,1.7,s.kind==='serve'?0xf4ce74:s.kind==='board'?0x9bc684:0xd5a17f,.16);}
-  if(stage.sushi){
+  if(stage.sushi&&!stage.buffet){
    panel(0,.9,8.1,3.5,0x243d43,.55);
    for(const x of [-1.4,1.4])for(const z of [0,1.8])block(.7,.14,1.42,0x29484d,x,1.2,z);
    for(const x of [-2.8,2.8])block(2.17,.14,.5,0x29484d,x,1.2,.9);
    for(const z of [-.8,2.6])block(8,.06,.10,0xeab96e,0,1.31,z);
    for(const x of [-4,4])block(.10,.06,3.5,0xeab96e,x,1.31,.9);
    for(const x of [-3,0,3]){block(.95,.95,.06,0xaa4745,x,3,-7.6);block(.06,.6,.08,0xffe2af,x,3,-7.5);}
+  }
+  if(stage.buffet){
+   block(28,.22,18.5,0x544038,0,.02,0);
+   for(let ix=0;ix<14;ix++)for(let iz=0;iz<9;iz++)block(1.96,.02,1.96,(ix+iz)%2?0xc9b18d:0xe2cdaa,(ix-6.5)*2,.145,(iz-4)*2);
+   panel(0,0,17.6,9.9,0xc27e53,.10);
+   for(const z of [-6.2,6.2]){block(23.2,.20,1.45,0x29484d,0,1.2,z);for(const edge of [-.78,.78])block(23.3,.07,.10,0xe6ba77,0,1.35,z+edge);}
+   for(const x of [-10.5,10.5]){block(2.17,.2,12.4,0x29484d,x,1.2,0);for(const edge of [-1.13,1.13])block(.1,.07,12.5,0xe6ba77,x+edge,1.35,0);}
+   const customer=(x,z,i)=>{block(.78,.16,.74,0x954a42,x,.48,z);block(.16,.48,.16,0x684b3e,x,.21,z);block(.57,.62,.4,[0x638d8c,0xc07666,0x7e7dab][i%3],x,.95,z);const head=new THREE.Mesh(new THREE.SphereGeometry(.25,10,8),mat(0xe5b594));head.position.set(x,1.5,z);root.add(head);};
+   for(const z of [-8,8])for(let i=0;i<6;i++)customer((i-2.5)*3.8,z,i);
+   for(const x of [-12.7,12.7])for(let i=0;i<3;i++)customer(x,(i-1)*3.8,i);
+   for(const x of [-10.5,0,10.5]){block(.2,3.6,.2,0x854a40,x,1.8,-8.6);block(2,.7,.15,0xa54c46,x,3.25,-8.6);for(const dx of [-.45,0,.45])block(.08,.43,.17,0xf2d9ac,x+dx,3.25,-8.5);}
   }
   if(stage.roles){panel(-3.6,0,6.9,11,0x70bea5,.12);panel(3.6,0,6.9,11,0xecaa68,.12);}
   if(stage.layout==='island'){panel(0,0,3.7,3.2,0x92bb63,.23);for(const x of [-2.1,2.1])for(const z of [-1.5,-.5,.5,1.5]){block(.45,.06,.4,0x8cb358,x,.25,z);}}

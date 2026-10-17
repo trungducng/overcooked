@@ -68,3 +68,7 @@ Màn 5 là Sushi băng chuyền, vòng 6 bàn chở món và nguyên liệu, đ�
 Thực đơn có 16 công thức thuộc 5 nhóm: súp, salad, burger, sushi và cơm tô. Sushi/cơm tô dùng gạo nấu trong nồi (có chín/cháy/dập lửa), cá/dưa thái và rong biển sống; ráp đúng thành phần trên đĩa.
 
 PvP: Không bot / bot Cam / bot Xanh / bot cả hai đội (2v2). P1/P2 là người, P3/P4 là bot theo đội Cam/Xanh. Hai người online vẫn có thể dùng bot vào hai ghế còn lại; bot mô phỏng tại host. Bot tôn trọng quyền làm món ở thớt/nồi/chảo/bàn ráp/bàn chứa, nhường người đang đứng trước quầy kể cả tay không. Quyền này hết sau thời gian rời quầy, tránh bỏ món vĩnh viễn. Đây là quy tắc AI; người chơi vẫn được nhặt/chuyển đồ cho nhau.
+
+## Màn 10 — Buffet vòng quanh
+
+Màn bonus mở sẵn: đầu bếp ở bếp giữa, 12 bàn băng chuyền chạy quanh, khách ngồi ngoài vòng. Nguyên liệu, thớt, nồi, chảo, đĩa, bàn ráp và bồn rửa ở bên trong. Món hoàn chỉnh đặt lên vòng, chuyển bàn mỗi 3 giây và được phục vụ tự động ở cuối tuyến. Bếp rộng hơn; ranh giới di chuyển giữ đầu bếp bên trong, không đi xuyên vòng. Màn sushi 6 bàn cũ vẫn giữ. Tiến trình tăng lên 30 sao; khóa của 9 màn cũ giữ nguyên.

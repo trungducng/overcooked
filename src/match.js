@@ -10,9 +10,9 @@ export class KitchenMatch {
     this.round=Date.now()+'-'+(++matchSequence);
     this.options={mode:'solo',map:'sunny',level:0,difficulty:'normal',...options};
     if(!MODES[this.options.mode])this.options.mode='solo';
-    this.options.level=Math.max(0,Math.min(2,Math.floor(Number(this.options.level)||0)));
+    this.options.level=Math.max(0,Math.min(3,Math.floor(Number(this.options.level)||0)));
     this.options.pvpBots=['orange','blue','both'].includes(this.options.pvpBots)?this.options.pvpBots:'none';
-    this.options.map=getMap(this.options.map).id;this.level=getStage(this.options.map,this.options.level);this.map=stageMap(this.level);
+    this.options.map=getMap(this.options.map).id;this.level=getStage(this.options.map,this.options.level);this.options.level=this.level.level;this.map=stageMap(this.level);
     this.competitive=isVersus(this.options.mode);this.stations=stageStations(this.level,this.competitive);
     const config={...this.level,recipeOffset:this.level.recipeOffset+MAPS.findIndex(m=>m.id===this.map.id)};
     this.games=Array.from({length:this.competitive?2:1},()=>new KitchenGame(config));

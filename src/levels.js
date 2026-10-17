@@ -1,7 +1,7 @@
 import { STATIONS } from './engine.js';
 
 export const MODES = {
-  solo: { name: 'Một mình', icon: '♨', description: 'Chinh phục 9 màn và săn đủ 3 sao.' },
+  solo: { name: 'Một mình', icon: '♨', description: 'Chinh phục 10 màn và săn đủ 3 sao.' },
   assist: {name:'Cùng phụ bếp',icon:'✿',description:'Bạn và bot chung điểm. Bot nhận đồ, nấu, rửa và nhường quầy.'},
   coop: { name: 'Đồng đội', icon: '♡', description: '2–4 người, chung căn bếp và chung điểm.' },
   pvp: { name: 'Đấu tay đôi', icon: '⚔', description: 'Hai người cùng bàn phím. Chung một bếp, tranh đơn và đua điểm!' },
@@ -43,4 +43,4 @@ export function getStations(mapId='sunny', versus=false) {
 }
 export const isVersus = mode=>mode==='pvp'||mode==='bot';
 
-export const stationsForTeam=(stations,team)=>stations.filter(s=>s.team===undefined||s.team===team);
+export const stationsForTeam=(stations,team)=>Object.assign(stations.filter(s=>s.team===undefined||s.team===team),{bounds:stations.bounds});

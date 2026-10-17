@@ -3,7 +3,7 @@ import {moveChef, recoverChef} from './movement.js';
 import { createNavigator, nearestStation, speedMultiplier } from './navigation.js';
 export const BOT_DIFFICULTIES={easy:{name:'Tập sự',speed:2.7,delay:.4},normal:{name:'Đầu bếp',speed:3.2,delay:.18},hard:{name:'Bếp trưởng',speed:3.8,delay:.04}};
 export class ChefBot{
-  constructor(stations,map,difficulty='normal'){this.stations=stations.filter(s=>s.team===undefined||s.team===1);this.map=map;this.settings=BOT_DIFFICULTIES[difficulty]||BOT_DIFFICULTIES.normal;this.navigator=createNavigator(this.stations);this.path=[];this.targetId=null;this.wait=0;this.recipe=null;this.label='Đang chọn món';}
+  constructor(stations,map,difficulty='normal'){this.stations=Object.assign(stations.filter(s=>s.team===undefined||s.team===1),{bounds:stations.bounds});this.map=map;this.settings=BOT_DIFFICULTIES[difficulty]||BOT_DIFFICULTIES.normal;this.navigator=createNavigator(this.stations);this.path=[];this.targetId=null;this.wait=0;this.recipe=null;this.label='Đang chọn món';}
   reserved(game,p,s){
     if(!s||!['board','pot','grill','assembly','counter'].includes(s.kind))return false;
     const claim=game.claims?.[s.id];if(claim&&claim.remaining>0&&claim.owner!==chefKey(p))return true;
