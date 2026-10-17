@@ -42,3 +42,7 @@ html,body{overscroll-behavior:none}body{height:100dvh}.play-area{touch-action:ma
 .stage-preview{height:82px}.stage-preview svg{width:100%;height:100%}.stage-card strong{margin:6px 0 3px}.stage-menu{margin-top:4px}.stage-grid{gap:9px;margin:10px 0 16px}@media(max-width:600px){.stage-preview{height:76px}}
 
 .ticket .ingredient{min-width:0;flex-shrink:1}.ticket .ingredients{min-width:0}
+
+.customer-bubble{position:absolute;transform:translate(-50%,-100%);z-index:6;display:flex;align-items:center;gap:5px;background:#fff3db;color:#344c53;border:2px solid #c6a466;border-bottom-width:4px;border-radius:10px;padding:4px 6px;box-shadow:0 3px 8px #0004;pointer-events:none;font:700 10px sans-serif}.customer-bubble[hidden]{display:none}.customer-bubble span{font-size:24px}.customer-bubble small{font-size:9px}.customer-bubble.matching{background:#cbf4ce;border-color:#4ea47a;box-shadow:0 0 12px #94dc97}.customer-bubble.urgent{border-color:#db6d48;color:#aa4029}@media(max-width:700px){.customer-bubble{padding:3px 4px;gap:3px;font-size:8px}.customer-bubble span{font-size:18px}.customer-bubble small{font-size:7px}}
+
+.buffet-mode .ticket{height:98px;padding-top:5px}.buffet-mode .ticket-dish{margin:2px 0 5px}.buffet-mode .ticket .dish-emoji{font-size:25px}.buffet-mode .ticket h3{font-size:9px}.buffet-mode .ticket .ingredient{height:23px;font-size:16px}@media(max-width:700px){.buffet-mode .ticket{height:89px}.buffet-mode .ticket-dish{height:39px}.buffet-mode .ticket h3{font-size:6px}.buffet-mode .ticket .ingredient{height:18px;font-size:12px}}

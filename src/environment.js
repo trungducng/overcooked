@@ -5,8 +5,9 @@ export class KitchenEnvironment {
   if(this.stage.belt){
    const interval=this.stage.beltInterval||6,cycle=Math.floor(this.time/interval),slots=this.stations.filter(s=>s.belt).sort((a,b)=>(a.beltIndex??a.x)-(b.beltIndex??b.x));
    while(this.beltCycle<cycle){this.beltCycle++;if(slots.length){const items=slots.map(s=>this.kitchen.counters[s.id]);this.direction=this.stage.reverse&&Math.floor(this.beltCycle*interval/(this.stage.sushi?36:18))%2?-1:1;
+   if(this.stage.buffet)for(let i=0;i<slots.length;i++){if(items[i]?.kind==='meal'&&this.deliver?.(items[i],slots[i])){items[i]=undefined;delete this.kitchen.claims?.[slots[i].id];this.events.push('belt-serve');}}
    const exit=this.direction>0?slots.length-1:0,out=items[exit];
-   if(out?.kind==='meal'&&this.deliver?.(out)){items[exit]=undefined;delete this.kitchen.claims?.[slots[exit].id];this.events.push('belt-serve');}
+   if(!this.stage.buffet&&out?.kind==='meal'&&this.deliver?.(out,slots[exit])){items[exit]=undefined;delete this.kitchen.claims?.[slots[exit].id];this.events.push('belt-serve');}
    const claims=slots.map(s=>this.kitchen.claims?.[s.id]);
    for(let i=0;i<slots.length;i++){const incoming=items[(i+slots.length-this.direction)%slots.length];if(incoming)this.kitchen.counters[slots[i].id]=incoming;else delete this.kitchen.counters[slots[i].id];if(this.kitchen.claims){const claim=claims[(i+slots.length-this.direction)%slots.length];if(claim)this.kitchen.claims[slots[i].id]=claim;else delete this.kitchen.claims[slots[i].id];}}this.events.push('belt');}}
   }

@@ -72,3 +72,9 @@ PvP: Không bot / bot Cam / bot Xanh / bot cả hai đội (2v2). P1/P2 là ngư
 ## Màn 10 — Buffet vòng quanh
 
 Màn bonus mở sẵn: đầu bếp ở bếp giữa, 12 bàn băng chuyền chạy quanh, khách ngồi ngoài vòng. Nguyên liệu, thớt, nồi, chảo, đĩa, bàn ráp và bồn rửa ở bên trong. Món hoàn chỉnh đặt lên vòng, chuyển bàn mỗi 3 giây và được phục vụ tự động ở cuối tuyến. Bếp rộng hơn; ranh giới di chuyển giữ đầu bếp bên trong, không đi xuyên vòng. Màn sushi 6 bàn cũ vẫn giữ. Tiến trình tăng lên 30 sao; khóa của 9 màn cũ giữ nguyên.
+
+## Khách tại bàn và thi đấu tranh đơn
+
+Buffet có khách đi từ lối vào tới ghế, ngồi rồi mới gọi món (tối đa 3 đơn đang chờ). Thẻ đơn và bong bóng ghi số bàn, món và thời gian. Cầm đúng món, tới mép quầy trước ghế và E để phục vụ. Khách nhận món, đội phục vụ đầu tiên nhận tiền, đĩa bẩn về bồn rửa, khách rời ghế rồi lượt mới tới. Khách hết kiên nhẫn bỏ đi. Hai đội dùng cùng đơn khách; phục vụ sai bàn/sai món hoặc lặp lại sau đội kia không tiêu thụ món và không có tiền. Băng chuyền giao món khi tới đúng ghế có khách đang đợi món đó. Bot cũng mang món tới bàn. Host quyết định kết quả và đồng bộ khách qua mạng.
+
+Băng chuyền dùng khung extrude 3D, gỗ/kim loại phản sáng, thành bo góc, chân đỡ và con lăn. Mắt xích nổi chuyển động dùng instancing để giảm draw call. Không dùng tấm màu phẳng ghép làm thân vòng.

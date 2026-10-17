@@ -1,6 +1,6 @@
 import Peer from 'peerjs';
 import {sanitizeInput} from './sync.js';
-const PROTOCOL=2,PREFIX='kitchen-rush-v5-';
+const PROTOCOL=3,PREFIX='kitchen-rush-v6-';
 const makeCode=()=>crypto.randomUUID().replaceAll('-','').slice(0,6).toUpperCase();
 const empty=()=>({x:0,z:0,work:false,actions:[]});
 export class OnlineRoom {

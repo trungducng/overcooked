@@ -1,9 +1,10 @@
 const playerKeys=['id','x','z','dir','item','team','active','dash','cooldown','moving','work'];
 const gameKeys=['status','time','score','served','missed','combo','sequence','orders','rush'];
 const pick=(o,keys)=>Object.fromEntries(keys.map(k=>[k,o[k]]));
-export function snapshot(match,players,handling){return JSON.parse(JSON.stringify({version:1,round:match.round,options:match.options,games:match.games.map(g=>pick(g,gameKeys)),kitchen:match.kitchen,players:players.map(p=>pick(p,playerKeys)),loose:handling.items,environment:{time:match.environment.time,beltCycle:match.environment.beltCycle,warning:match.environment.warning,gateOpen:match.environment.gateOpen,direction:match.environment.direction,vents:match.environment.vents},stations:match.stations.map(s=>pick(s,['id','x','z','enabled','warning']))}));}
+export function snapshot(match,players,handling){return JSON.parse(JSON.stringify({version:1,round:match.round,options:match.options,games:match.games.map(g=>pick(g,gameKeys)),kitchen:match.kitchen,customers:match.customers?.snapshot(),players:players.map(p=>pick(p,playerKeys)),loose:handling.items,environment:{time:match.environment.time,beltCycle:match.environment.beltCycle,warning:match.environment.warning,gateOpen:match.environment.gateOpen,direction:match.environment.direction,vents:match.environment.vents},stations:match.stations.map(s=>pick(s,['id','x','z','enabled','warning','customerActive']))}));}
 export function applySnapshot(state,match,players,handling){
  if(state.version!==1||state.games.length!==match.games.length)return false;
+ if(state.customers&&match.customers)match.customers.apply(state.customers);
  Object.assign(match.kitchen,state.kitchen);for(let i=0;i<match.games.length;i++)Object.assign(match.games[i],state.games[i]);
  for(let i=0;i<players.length;i++)if(state.players[i])Object.assign(players[i],state.players[i]);
  handling.items=state.loose;handling.sequence=Math.max(0,...state.loose.map(e=>e.id));Object.assign(match.environment,state.environment);

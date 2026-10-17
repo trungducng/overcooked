@@ -29,12 +29,13 @@ export class ChefBot{
       else if(game.assembly){const keys=game.assembly.components.map(c=>c.kind+':'+c.ingredient);this.recipe=matching(r=>r.components&&keys.every(k=>r.components.includes(k)));}
       else if(game.grill.item)this.recipe=matching(r=>r.components?.includes('cooked:beef'));
     }
-    if(!this.recipe)this.recipe=candidates[0];
+    if(!this.recipe)this.recipe=candidates[0];if(!this.recipe)return {station:null,label:'Chờ khách ngồi và gọi món'};
     const fire=this.stations.find(s=>game.fires?.[s.id]);if(fire){if(p.item)return{station:own('trash'),label:'Dọn tay cứu bếp'};return{station:fire,work:true,label:'Dập lửa quầy bếp'}};
     if(!p.item){const stale=this.stations.find(s=>s.belt&&game.counters[s.id]?.kind==='meal'&&(game.counters[s.id].deliveryTeam??0)===(p.team??0)&&!game.orders.some(o=>o.recipe===game.counters[s.id].recipe)&&!this.reserved(game,p,s));if(stale)return {station:stale,label:'Thu món hết đơn · trả đĩa về bồn rửa'};}
     const park=()=>({station:this.stations.find(s=>s.kind==='counter'&&!game.counters[s.id])||own('trash'),label:'Đặt đồ tạm để nhường quầy'});
     const source=ingredient=>({station:this.stations.find(s=>s.kind==='counter'&&game.counters[s.id]?.ingredient===ingredient&&!this.reserved(game,p,s))||this.stations.find(s=>s.ingredient===ingredient),label:`Lấy ${INGREDIENTS[ingredient].name.toLowerCase()}`});
     for(const kind of ['pot','grill'])if(game[kind].burnt){if(p.item)return task(p.item.kind==='plate'?'sink':'trash',false,'Dọn tay để dập lửa');return task(kind,true,'Dập lửa');}
+    if(p.item?.kind==='meal'&&game.customerService){const order=game.orders.find(o=>o.recipe===p.item.recipe);return order?{station:this.stations.find(s=>s.customerId===order.seatId),label:`Mang món tới Bàn ${order.seatId+1}`}:{station:own('trash'),label:'Dọn món khách không còn chờ'};}
     if(p.item?.kind==='meal'){const belt=this.stations.find(s=>s.belt&&!game.counters[s.id]);return game.orders.some(o=>o.recipe===p.item.recipe)?{station:this.map.sushi&&belt?belt:own('serve'),label:this.map.sushi?'Đặt sushi lên băng chuyền phục vụ':'Giao món'}:task('trash',false,'Dọn món không còn đơn');}
     if(p.item?.kind==='plate'&&this.recipe.family!=='soup'&&game.assembly)return p.item.components?.length?park():task('sink',false,'Trả đĩa để tiếp tục món đang ráp');
     if(p.item?.kind==='plate')return task(this.recipe.family==='soup'?'pot':'assembly',false,this.recipe.family==='soup'?'Múc súp':'Đặt đĩa lên bàn ráp');
