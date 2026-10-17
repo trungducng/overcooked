@@ -17,7 +17,7 @@ export class KitchenMatch {
     this.games=Array.from({length:this.competitive?2:1},()=>new KitchenGame(config));
     this.kitchen=Object.fromEntries(['board','pot','grill','assembly','plates','dirty','wash','counters','fires'].map(key=>[key,this.games[0][key]]));
     for(const game of this.games)game.attachKitchen(this.kitchen);
-    this.environment=new KitchenEnvironment(this.level,this.stations,this.kitchen);
+    this.environment=new KitchenEnvironment(this.level,this.stations,this.kitchen,this.map);
     this.bot=this.options.mode==='assist'?new CoopBot(this.stations,this.map,this.options.difficulty,this.level):this.options.mode==='bot'?new ChefBot(stationsForTeam(this.stations,1),this.map,this.options.difficulty):null;
   }
   get status(){return this.games[0].status}

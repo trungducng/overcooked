@@ -12,11 +12,11 @@ export class ChefBot{
     const matching=(predicate)=>candidates.find(predicate)||RECIPES.find(predicate);
     if(this.lastServed!==game.served){this.recipe=null;this.lastServed=game.served;}
     if(!p.item){
-      if(game.board){const ingredient=game.board.ingredient,assemblyKeys=game.assembly?.components.map(c=>c.kind+':'+c.ingredient)||[],assemblyRecipe=game.assembly&&matching(r=>r.components&&r.components.includes('chopped:'+ingredient)&&!assemblyKeys.includes('chopped:'+ingredient)&&assemblyKeys.every(k=>r.components.includes(k)));this.recipe=ingredient==='beef'?RECIPES.find(r=>r.id==='burger'):ingredient==='lettuce'?RECIPES.find(r=>r.id==='salad'):
+      if(game.board){const ingredient=game.board.ingredient,assemblyKeys=game.assembly?.components.map(c=>c.kind+':'+c.ingredient)||[],assemblyRecipe=game.assembly&&matching(r=>r.components&&r.components.includes('chopped:'+ingredient)&&!assemblyKeys.includes('chopped:'+ingredient)&&assemblyKeys.every(k=>r.components.includes(k)));this.recipe=ingredient==='beef'?matching(r=>r.components?.includes('cooked:beef')):ingredient==='lettuce'?matching(r=>r.components?.includes('chopped:lettuce')):
         assemblyRecipe||matching(r=>r.family==='soup'&&contains(r,[...game.pot.ingredients,ingredient]))||matching(r=>r.ingredients.includes(ingredient));}
       else if(game.pot.ingredients.length)this.recipe=matchRecipe(game.pot.ingredients)||matching(r=>r.family==='soup'&&contains(r,game.pot.ingredients));
       else if(game.assembly){const keys=game.assembly.components.map(c=>c.kind+':'+c.ingredient);this.recipe=matching(r=>r.components&&keys.every(k=>r.components.includes(k)));}
-      else if(game.grill.item)this.recipe=RECIPES.find(r=>r.id==='burger');
+      else if(game.grill.item)this.recipe=matching(r=>r.components?.includes('cooked:beef'));
     }
     if(!this.recipe)this.recipe=candidates[0];
     const fire=this.stations.find(s=>game.fires?.[s.id]);if(fire){if(p.item)return{station:own('trash'),label:'Dọn tay cứu bếp'};return{station:fire,work:true,label:'Dập lửa quầy bếp'}};

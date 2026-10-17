@@ -1,21 +1,22 @@
-import {collides} from './navigation.js';
 export class KitchenEnvironment {
- constructor(stage,stations,kitchen){this.stage=stage;this.stations=stations;this.kitchen=kitchen;this.time=0;this.beltCycle=0;this.warning=false;this.revision=0;this.events=[];this.gateOpen=true;this.spread={};}
+ constructor(stage,stations,kitchen,map=null){this.stage=stage;this.stations=stations;this.kitchen=kitchen;this.time=0;this.beltCycle=0;this.warning=false;this.revision=0;this.events=[];this.gateOpen=true;this.spread={};this.map=map;this.direction=1;this.vents=stage.vents?[{x:-3.2,z:2,rx:1.3,rz:.75,offset:0},{x:3.2,z:-2,rx:1.3,rz:.75,offset:7}]:[];}
  tick(dt,players=[]){
   const before=this.time;this.time+=dt;
   if(this.stage.belt){
    const cycle=Math.floor(this.time/6),slots=this.stations.filter(s=>s.belt).sort((a,b)=>a.x-b.x);
-   while(this.beltCycle<cycle){this.beltCycle++;if(slots.length){const items=slots.map(s=>this.kitchen.counters[s.id]);for(let i=0;i<slots.length;i++){const incoming=items[(i+slots.length-1)%slots.length];if(incoming)this.kitchen.counters[slots[i].id]=incoming;else delete this.kitchen.counters[slots[i].id];}this.events.push('belt');}}
+   while(this.beltCycle<cycle){this.beltCycle++;if(slots.length){const items=slots.map(s=>this.kitchen.counters[s.id]);for(let i=0;i<slots.length;i++){this.direction=this.stage.reverse&&Math.floor(this.beltCycle*6/18)%2?-1:1;const incoming=items[(i+slots.length-this.direction)%slots.length];if(incoming)this.kitchen.counters[slots[i].id]=incoming;else delete this.kitchen.counters[slots[i].id];}this.events.push('belt');}}
   }
-  if(this.stage.gate){
-   const phase=this.time%16,gate=this.stations.find(s=>s.id==='gate');this.warning=phase>=8&&phase<10;
-   const shouldClose=phase>=10&&phase<15;
-   // Never close a gate through a chef, or teleport a chef to the other side.
+  this.warning=false;
+  for(const gate of this.stations.filter(s=>s.dynamic&&s.id.startsWith('gate'))){
+   const offset=gate.phaseOffset||0,phase=(this.time+offset)%16,oldPhase=(before+offset)%16,warn=phase>=8&&phase<10;
+   this.warning ||= warn;gate.warning=warn;
    const occupied=players.some(p=>p.active!==false&&Math.abs(p.x-gate.x)<gate.width/2+.4&&Math.abs(p.z-gate.z)<gate.depth/2+.4);
-   const enabled=shouldClose&&!occupied;
-   if(gate.enabled!==enabled){gate.enabled=enabled;this.revision++;this.events.push(enabled?'gate-close':'gate-open');}this.gateOpen=!enabled;
-   if(before%16<8&&phase>=8)this.events.push('warning');
+   const enabled=phase>=10&&phase<15&&!occupied;
+   if(gate.enabled!==enabled){gate.enabled=enabled;this.revision++;this.events.push(enabled?'gate-close':'gate-open');}if(gate.id==='gate')this.gateOpen=!enabled;
+   if(warn&&(oldPhase<8||oldPhase>=10))this.events.push('warning');
   }
+  for(const vent of this.vents){const phase=(this.time+vent.offset)%14,was=vent.warning;vent.warning=phase>=4&&phase<6;vent.active=phase>=6&&phase<10;if(vent.warning&&!was)this.events.push('steam-warning');}
+  if(this.map)this.map.dynamicHazards=this.vents.filter(v=>v.active).map(v=>({...v,multiplier:.35}));
   // Burning cookware ignites a neighbour after eight seconds. Extinguishing
   // individual counters is always possible with empty hands, including the sink.
   const hot=this.stations.filter(s=>(s.kind==='pot'||s.kind==='grill')&&this.kitchen[s.kind].burnt||this.kitchen.fires?.[s.id]);

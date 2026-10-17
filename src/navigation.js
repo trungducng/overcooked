@@ -8,7 +8,7 @@ export function collides(x,z,stations){
 export function nearestStation(p,stations){
   let found=null,best=1.67;for(const s of stations){if(s.kind==='obstacle')continue;const d=Math.hypot(p.x-s.x,p.z-s.z);if(d<best){found=s;best=d}}return found;
 }
-export function speedMultiplier(p,map){return map.hazard.some(h=>((p.x-h.x)/h.rx)**2+((p.z-h.z)/h.rz)**2<1)?.58:1;}
+export function speedMultiplier(p,map){const hits=[...(map.hazard||[]),...(map.dynamicHazards||[])].filter(h=>((p.x-h.x)/h.rx)**2+((p.z-h.z)/h.rz)**2<1);return hits.length?Math.min(...hits.map(h=>h.multiplier??.58)):1;}
 // Four-way navigation avoids corner cutting. Both bot and humans use collides().
 export function createNavigator(stations){
   const step=.24,nx=63,nz=47,cells=new Map();

@@ -7,7 +7,8 @@ export function createAlternateSets(scene,batch){
  function box(root,w,h,d,mat,x,y,z){const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;root.add(mesh);return mesh;}
  function cyl(root,r,h,mat,x,y,z){const mesh=new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,16),mat);mesh.position.set(x,y,z);mesh.castShadow=true;mesh.receiveShadow=true;root.add(mesh);return mesh;}
  function ball(root,r,mat,x,y,z,scale=[1,1,1]){const mesh=new THREE.Mesh(new THREE.SphereGeometry(r,12,8),mat);mesh.position.set(x,y,z);mesh.scale.set(...scale);mesh.castShadow=true;root.add(mesh);return mesh;}
- function foundation(root,tileA,tileB){box(root,16.6,.5,12.5,dark,0,-.2,0);const materials=[material(tileA),material(tileB)];for(let x=0;x<16;x++)for(let z=0;z<12;z++)box(root,.98,.08,.98,materials[(x+z)%2],x-7.5,.09,z-5.5);for(const z of [-6.2,6.2])box(root,16.8,.25,.2,wood,0,.13,z);for(const x of [-8.3,8.3])box(root,.2,.25,12.6,wood,x,.13,0);}
+ const floorMaterials=new Map();
+ function foundation(root,tileA,tileB){box(root,16.6,.5,12.5,dark,0,-.2,0);const materials=[material(tileA),material(tileB)];floorMaterials.set(root,materials);for(let x=0;x<16;x++)for(let z=0;z<12;z++)box(root,.98,.08,.98,materials[(x+z)%2],x-7.5,.09,z-5.5);for(const z of [-6.2,6.2])box(root,16.8,.25,.2,wood,0,.13,z);for(const x of [-8.3,8.3])box(root,.2,.25,12.6,wood,x,.13,0);}
  const harbor=new THREE.Group(),market=new THREE.Group();scene.add(harbor,market);
  foundation(harbor,0xa6bcc2,0x738f9a);foundation(market,0xceaa78,0x957357);
  // Dockside canteen: overhead gantry, safety stripes, vents and cargo outside.
@@ -40,5 +41,5 @@ export function createAlternateSets(scene,batch){
  for(let i=0;i<9;i++){const x=(i-4)*1.7,y=3.9+Math.abs(i-4)*.06;box(market,.035,.5,.035,dark,x,y+.6,-7.7);ball(market,.38,lantern,x,y,-7.7,[.85,1.1,.85]);for(const d of [-.36,.36])cyl(market,.2,.06,gold,x,y+d,-7.7);box(market,.035,.27,.035,gold,x,y-.55,-7.7);}
  box(market,7.5,1.2,1.6,red,0,.65,-9);box(market,8,.15,1.9,wood,0,1.35,-9);for(let i=0;i<6;i++)cyl(market,.32,.15,cream,-2.8+i*1.1,1.52,-8.7);
  batch(harbor);batch(market);harbor.visible=false;market.visible=false;
- return {setTheme(id){harbor.visible=id==='harbor';market.visible=id==='market';},harbor,market};
+ return {setTheme(id,stage){if(stage){for(const [root,mats] of floorMaterials)if(root===(id==='harbor'?harbor:market)){mats[0].color.set(stage.style.floor);mats[1].color.set(stage.style.secondary);}}harbor.visible=id==='harbor';market.visible=id==='market';},harbor,market};
 }

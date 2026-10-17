@@ -14,7 +14,7 @@ npm run build
 - Solo; Cùng phụ bếp (bot chung điểm); Đồng đội 2–4 người local; PvP 2 người; đấu bot.
 - Online: Chọn trận đấu → Chơi online → Tạo phòng / nhập mã 6 ký tự. Đồng đội tối đa 4 người, PvP 2 người. Khách luôn dùng bộ phím P1 trên máy mình. Chủ phòng mô phỏng toàn bộ trận, khách chỉ gửi input.
 - Đạt ít nhất 1 sao để mở ca tiếp. Tiến trình lưu trên trình duyệt. Luyện tập tự do mở mọi màn, không ghi sao/điểm tốt nhất.
-- Hành trình gồm 9 bố cục riêng: Bữa súp đầu tiên; Cửa sổ đồng đội; Đại tiệc ba món; Bến cảng trơn trượt; Dây chuyền phục vụ; Cầu cảng đóng mở; Chợ rau ban đêm; Đảo bếp chuyển động; Ca làm bão lửa.
+- Hành trình gồm 9 bố cục riêng: Bữa súp đầu tiên; Cửa sổ đồng đội; Vườn bếp chữ U; Bến cảng chữ S; Dây chuyền phục vụ; Hai cửa luân phiên; Chợ đêm zigzag; Đảo bếp chuyển động; Ca làm bão lửa.
 
 ## Điều khiển local
 
@@ -52,3 +52,11 @@ Xem [trạng thái lộ trình](docs/implementation-plan.md) và [bằng chứng
 Tự nhận diện cảm ứng qua `any-pointer: coarse` hoặc `maxTouchPoints` (bao gồm iPad trình duyệt desktop). Cần kéo trái, Lấy/Đặt phải, giữ nút dao để thái/rửa/dập lửa; Ném, Thả, Lướt riêng. Hai pointer độc lập; thả/cancel/chuyển tab/pause/xoay máy trả input về 0. Camera và HUD dành khoảng trống cho hai ngón, `viewport-fit=cover` + safe area cho tai thỏ/thanh home. Chơi dọc được, ngang nhìn bếp rộng hơn.
 
 Một màn cảm ứng điều khiển một người; local nhiều chef cần thêm bàn phím hoặc tay cầm. Mỗi người dùng điện thoại/iPad riêng thì vào cùng mã phòng online. Có nút Cảm ứng để bật thử trên máy dùng chuột. Đã QA viewport 390×844, 844×390, 1024×768; kéo joystick và bấm lướt trong browser, kiểm tra lifecycle đa pointer tự động. Chưa chạy trên Safari/iPad phần cứng thật.
+
+## Đa dạng màn và phản hồi hình ảnh (17/10)
+
+Menu có đủ 9 thẻ màn với sơ đồ lấy từ vị trí quầy thật, món và cơ chế riêng. Bếp chữ U gom sơ chế vào giữa; bến cảng chữ S buộc đi vòng; hai cửa đóng luân phiên; chợ có vách zigzag; băng chuyền đổi hướng mỗi 18 giây; ca cuối có ô hơi nước cảnh báo trước khi làm chậm. Mỗi màn có bảng màu, vùng làm việc và trang trí riêng.
+
+Thêm salad nấm rừng và burger hành tây (8 công thức), cùng hiệu ứng thái, rửa, hơi nấu, món chín, cháy, lướt, ném/bắt và giao món. Hạt/vòng dùng pool hữu hạn, hai draw call; chế độ Nhẹ giảm số hạt. Hiệu ứng không can thiệp inventory/simulation.
+
+Kiểm tra tự động bao gồm bot chơi các công thức mới, đường tiếp cận tất cả quầy ở 9 màn, cửa luân phiên, chu kỳ hơi nước, đổi chiều băng chuyền và giới hạn hiệu ứng. Chưa có phép đo FPS trên điện thoại/iPad thật; kiểm thử online khác mạng và gamepad phần cứng vẫn còn.
