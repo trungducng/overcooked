@@ -78,3 +78,5 @@ Màn bonus mở sẵn: đầu bếp ở bếp giữa, 12 bàn băng chuyền ch�
 Buffet có khách đi từ lối vào tới ghế, ngồi rồi mới gọi món (tối đa 3 đơn đang chờ). Thẻ đơn và bong bóng ghi số bàn, món và thời gian. Cầm đúng món, tới mép quầy trước ghế và E để phục vụ. Khách nhận món, đội phục vụ đầu tiên nhận tiền, đĩa bẩn về bồn rửa, khách rời ghế rồi lượt mới tới. Khách hết kiên nhẫn bỏ đi. Hai đội dùng cùng đơn khách; phục vụ sai bàn/sai món hoặc lặp lại sau đội kia không tiêu thụ món và không có tiền. Băng chuyền giao món khi tới đúng ghế có khách đang đợi món đó. Bot cũng mang món tới bàn. Host quyết định kết quả và đồng bộ khách qua mạng.
 
 Băng chuyền dùng khung extrude 3D, gỗ/kim loại phản sáng, thành bo góc, chân đỡ và con lăn. Mắt xích nổi chuyển động dùng instancing để giảm draw call. Không dùng tấm màu phẳng ghép làm thân vòng.
+
+Phục vụ tận bàn được thưởng thêm 25% trên tổng giá món, tip và combo (sau thưởng giờ cao điểm nếu có). Băng chuyền giữ giá chuẩn. Bàn khớp món hiển thị Tận bàn +25%; hiệu ứng tiền xuất hiện ngay tại bàn được phục vụ. Hai cách dùng cùng đơn, nên không thể nhận tiền cả hai lần.

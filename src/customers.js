@@ -15,13 +15,13 @@ export class CustomerService{
   }
   for(const station of this.stations.filter(s=>s.kind==='customer'))station.customerActive=this.seats[station.customerId].status==='seated';
  }
- serve(game,p,id){const seat=this.seats[id];if(!seat||seat.status!=='seated')return game.fail('Khách đã được phục vụ hoặc chưa gọi món.');if(p.item?.kind!=='meal'||p.item.recipe!==seat.order.recipe)return game.fail(`Bàn ${id+1} gọi ${RECIPES.find(r=>r.id===seat.order.recipe).name}. Mang đúng món tới nhé.`);
-  const order=seat.order,first=this.orders[0]?.id===order.id,recipe=RECIPES.find(r=>r.id===order.recipe),tip=Math.ceil(order.time/10)*2;game.combo=first?game.combo+1:0;const multiplier=1+Math.min(game.combo,5)*.2,points=Math.round((recipe.value+tip)*multiplier*(game.rush?1.25:1));
+ serve(game,p,id,service='table'){const seat=this.seats[id];if(!seat||seat.status!=='seated')return game.fail('Khách đã được phục vụ hoặc chưa gọi món.');if(p.item?.kind!=='meal'||p.item.recipe!==seat.order.recipe)return game.fail(`Bàn ${id+1} gọi ${RECIPES.find(r=>r.id===seat.order.recipe).name}. Mang đúng món tới nhé.`);
+  const order=seat.order,first=this.orders[0]?.id===order.id,recipe=RECIPES.find(r=>r.id===order.recipe),tip=Math.ceil(order.time/10)*2;game.combo=first?game.combo+1:0;const multiplier=1+Math.min(game.combo,5)*.2,serviceMultiplier=service==='table'?1.25:1,points=Math.round((recipe.value+tip)*multiplier*(game.rush?1.25:1)*serviceMultiplier);
   // Close the shared order before awarding it; another team cannot win it again.
   seat.status='leaving';seat.phase=0;for(const s of this.stations)if(s.customerId===id)s.customerActive=false;
-  game.score+=points;game.served++;game.dirty++;p.item=null;game.emit('serve',`Bàn ${id+1} · +${points}đ`,{points,combo:game.combo,base:recipe.value,tip,multiplier,rush:game.rush,customerId:id});return true;
+  this.lastService={seatId:id,service,team:p.team??0,time:this.time};game.score+=points;game.served++;game.dirty++;p.item=null;game.emit('serve',`Bàn ${id+1} · +${points}đ${service==='table'?' · Tận bàn +25%':' · Băng chuyền'}`,{points,combo:game.combo,base:recipe.value,tip,multiplier,rush:game.rush,customerId:id,service,serviceMultiplier});return true;
  }
- belt(game,item,station){const seat=this.seats.find(s=>s.status==='seated'&&s.beltIndex===station.beltIndex&&s.order.recipe===item.recipe);return seat?this.serve(game,{item,team:item.deliveryTeam??0},seat.id):false}
- snapshot(){return JSON.parse(JSON.stringify({time:this.time,sequence:this.sequence,nextArrival:this.nextArrival,nextSeat:this.nextSeat,seats:this.seats}))}
+ belt(game,item,station){const seat=this.seats.find(s=>s.status==='seated'&&s.beltIndex===station.beltIndex&&s.order.recipe===item.recipe);return seat?this.serve(game,{item,team:item.deliveryTeam??0},seat.id,'belt'):false}
+ snapshot(){return JSON.parse(JSON.stringify({time:this.time,sequence:this.sequence,nextArrival:this.nextArrival,nextSeat:this.nextSeat,lastService:this.lastService,seats:this.seats}))}
  apply(state){Object.assign(this,state);}
 }

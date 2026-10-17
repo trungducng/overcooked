@@ -13,7 +13,7 @@ export function createCustomerVisuals(scene,container,project,batch){
   const enter=seat.status==='arriving',leave=seat.status==='leaving',t=enter?Math.min(1,seat.phase/3):leave?Math.min(1,seat.phase/3):1;
   const offset=enter?(1-t)*3.2:leave?t*3.2:0;g.position.set(seat.x,.18+(seat.status==='seated'?.10:Math.abs(Math.sin(time*10))*.045),seat.z+Math.sign(seat.z)*offset);g.rotation.y=seat.z<0?0:Math.PI;
   const pos=project(g.position.x,2.15,g.position.z,0);bubble.style.left=pos.x+'px';bubble.style.top=pos.y+'px';bubble.classList.toggle('matching',seat.status==='seated'&&held?.recipe===seat.order?.recipe);bubble.classList.toggle('urgent',seat.status==='seated'&&seat.order.time<25);
-  bubble.innerHTML=seat.status==='seated'?`<b>B${seat.id+1}</b><span>${RECIPES.find(r=>r.id===seat.order.recipe).emoji}</span><small>${Math.ceil(seat.order.time)}s</small>`:enter?`<small>${seat.name} đang tới</small>`:'<small>✓ Cảm ơn!</small>';
+  bubble.innerHTML=seat.status==='seated'?`<b>B${seat.id+1}</b><span>${RECIPES.find(r=>r.id===seat.order.recipe).emoji}</span><small>${Math.ceil(seat.order.time)}s${held?.recipe===seat.order.recipe?'<br>Tận bàn +25%':''}</small>`:enter?`<small>${seat.name} đang tới</small>`:'<small>✓ Cảm ơn!</small>';
  }}
  return {reset,update};
 }

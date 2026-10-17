@@ -17,7 +17,7 @@ export class KitchenEffects {
   const playing=match.status==='playing',step=playing?Math.min(dt,.1):0;this.clock+=step;this.beat-=step;const first=!this.previous||this.previous.round!==match.round;
   if(first){this.reset();this.previous={round:match.round,served:match.games.map(g=>g.served),ready:match.kitchen.pot.ready,grill:match.kitchen.grill.ready,burnt:match.kitchen.pot.burnt||match.kitchen.grill.burnt,board:match.kitchen.board?.progress||0,wash:match.kitchen.wash,items:players.map(p=>JSON.stringify(p.item)),flying:new Map(),dash:players.map(p=>p.dash||0)};}
   const prev=this.previous,k=match.kitchen,at=kind=>match.stations.find(s=>s.kind===kind),low=quality==='light';
-  for(let i=0;i<match.games.length;i++){const g=match.games[i];if(g.served>prev.served[i]){const s=at('serve');this.burst(s.x,1.7,s.z,i?0x90d5ff:0xffcd59,low?14:32,2.5,1,.075);this.ring(s.x,s.z,0xa9ef9a);prev.served[i]=g.served;}}
+  for(let i=0;i<match.games.length;i++){const g=match.games[i];if(g.served>prev.served[i]){const s=match.customers?.lastService?match.stations.find(s=>s.customerId===match.customers.lastService.seatId):at('serve');this.burst(s.x,1.7,s.z,i?0x90d5ff:0xffcd59,low?14:32,2.5,1,.075);this.ring(s.x,s.z,0xa9ef9a);prev.served[i]=g.served;}}
   if(k.pot.ready&&!prev.ready){const s=at('pot');this.ring(s.x,s.z,0xa5ed93,1.45);this.burst(s.x,2.0,s.z,0xd9f9a7,10,.8,.75)}prev.ready=k.pot.ready;
   if(k.grill.ready&&!prev.grill){const s=at('grill');this.ring(s.x,s.z,0xa5ed93,1.45)}prev.grill=k.grill.ready;
   const burnt=k.pot.burnt||k.grill.burnt;if(burnt&&!prev.burnt){const s=at(k.pot.burnt?'pot':'grill');this.burst(s.x,1.6,s.z,0xff763a,22,2,1);this.ring(s.x,s.z,0xff573b)}prev.burnt=burnt;
