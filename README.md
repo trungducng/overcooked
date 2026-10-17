@@ -60,3 +60,11 @@ Menu có đủ 9 thẻ màn với sơ đồ lấy từ vị trí quầy thật, 
 Thêm salad nấm rừng và burger hành tây (8 công thức), cùng hiệu ứng thái, rửa, hơi nấu, món chín, cháy, lướt, ném/bắt và giao món. Hạt/vòng dùng pool hữu hạn, hai draw call; chế độ Nhẹ giảm số hạt. Hiệu ứng không can thiệp inventory/simulation.
 
 Kiểm tra tự động bao gồm bot chơi các công thức mới, đường tiếp cận tất cả quầy ở 9 màn, cửa luân phiên, chu kỳ hơi nước, đổi chiều băng chuyền và giới hạn hiệu ứng. Chưa có phép đo FPS trên điện thoại/iPad thật; kiểm thử online khác mạng và gamepad phần cứng vẫn còn.
+
+## Sushi băng chuyền và bot PvP
+
+Màn 5 là Sushi băng chuyền, vòng 6 bàn chở món và nguyên liệu, đảo chiều theo chu kỳ. Đặt món hoàn chỉnh lên vòng để tự phục vụ tại cuối tuyến; điểm ghi cho đội đặt món, đĩa bẩn trở lại bồn rửa. Món không khớp đơn giữ lại trên vòng. Quầy giao trực tiếp vẫn dùng được.
+
+Thực đơn có 16 công thức thuộc 5 nhóm: súp, salad, burger, sushi và cơm tô. Sushi/cơm tô dùng gạo nấu trong nồi (có chín/cháy/dập lửa), cá/dưa thái và rong biển sống; ráp đúng thành phần trên đĩa.
+
+PvP: Không bot / bot Cam / bot Xanh / bot cả hai đội (2v2). P1/P2 là người, P3/P4 là bot theo đội Cam/Xanh. Hai người online vẫn có thể dùng bot vào hai ghế còn lại; bot mô phỏng tại host. Bot tôn trọng quyền làm món ở thớt/nồi/chảo/bàn ráp/bàn chứa, nhường người đang đứng trước quầy kể cả tay không. Quyền này hết sau thời gian rời quầy, tránh bỏ món vĩnh viễn. Đây là quy tắc AI; người chơi vẫn được nhặt/chuyển đồ cho nhau.

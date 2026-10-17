@@ -25,7 +25,7 @@ export class KitchenEffects {
    this.beat=low?.22:.12;
    if((k.board?.progress||0)>prev.board){const s=at('board');this.burst(s.x,1.5,s.z,INGREDIENTS[k.board.ingredient].color,low?2:4,.8,.4,.045)}
    if(k.wash>prev.wash){const s=at('sink');this.burst(s.x,1.5,s.z,0xb7eeff,3,.55,.7,.06)}
-   if(k.pot.ingredients.length===2){const s=at('pot');this.burst(s.x,2.0,s.z,k.pot.burnt?0x76675e:0xe7eee1,low?1:2,.32,1.4,.10)}
+   if((k.pot.ingredients.length===2||k.pot.ingredients[0]==='rice')){const s=at('pot');this.burst(s.x,2.0,s.z,k.pot.burnt?0x76675e:0xe7eee1,low?1:2,.32,1.4,.10)}
    if(k.grill.item){const s=at('grill');this.burst(s.x,1.6,s.z,k.grill.burnt?0x6c625c:0xffbd65,2,.6,.6,.035)}
    for(const vent of match.environment.vents||[])if(vent.active)this.burst(vent.x,.25,vent.z,0xc8eef0,low?2:5,.6,1.0,.12);
   }

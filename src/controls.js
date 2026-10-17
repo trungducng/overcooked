@@ -12,4 +12,4 @@ export function readInput(index,keys,pad){const c=CONTROLS[index],pressed=n=>!!p
  return {x,z,work:keys.has(c.work)||pressed(2),interact:pressed(0),throw:pressed(1),drop:pressed(3),dash:pressed(5),pause:pressed(9)};
 }
 export function inputEdges(current,previous={}){return ['interact','throw','drop','dash','pause'].filter(key=>current[key]&&!previous[key])}
-export function activeSeats(options,stage){return options.mode==='coop'?Math.max(2,Math.min(4,Math.floor(options.players)||2)):options.mode==='solo'?(stage.roles?2:1):2}
+export function activeSeats(options,stage){return options.mode==='pvp'&&['blue','both'].includes(options.pvpBots)?4:options.mode==='pvp'&&options.pvpBots==='orange'?3:options.mode==='coop'?Math.max(2,Math.min(4,Math.floor(options.players)||2)):options.mode==='solo'?(stage.roles?2:1):2}

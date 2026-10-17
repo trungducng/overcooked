@@ -9,6 +9,14 @@ export function createStageDecor(scene,batch){
   // Coloured work zones and inset runners communicate the route without labels.
   const style=stage.style,accent=new THREE.Color(style.accent);panel(0,0,15.8,11.3,style.floor,.08);
   for(const s of stations){if(['board','pot','grill','serve','assembly'].includes(s.kind))panel(s.x,s.z,2.45,1.7,s.kind==='serve'?0xf4ce74:s.kind==='board'?0x9bc684:0xd5a17f,.16);}
+  if(stage.sushi){
+   panel(0,.9,8.1,3.5,0x243d43,.55);
+   for(const x of [-1.4,1.4])for(const z of [0,1.8])block(.7,.14,1.42,0x29484d,x,1.2,z);
+   for(const x of [-2.8,2.8])block(2.17,.14,.5,0x29484d,x,1.2,.9);
+   for(const z of [-.8,2.6])block(8,.06,.10,0xeab96e,0,1.31,z);
+   for(const x of [-4,4])block(.10,.06,3.5,0xeab96e,x,1.31,.9);
+   for(const x of [-3,0,3]){block(.95,.95,.06,0xaa4745,x,3,-7.6);block(.06,.6,.08,0xffe2af,x,3,-7.5);}
+  }
   if(stage.roles){panel(-3.6,0,6.9,11,0x70bea5,.12);panel(3.6,0,6.9,11,0xecaa68,.12);}
   if(stage.layout==='island'){panel(0,0,3.7,3.2,0x92bb63,.23);for(const x of [-2.1,2.1])for(const z of [-1.5,-.5,.5,1.5]){block(.45,.06,.4,0x8cb358,x,.25,z);}}
   if(stage.layout==='lanes'){for(const z of [-3,0,3])for(let i=0;i<7;i++)block(.35,.01,.07,0x89bfce,-4.8+i*1.6,.22,z);}

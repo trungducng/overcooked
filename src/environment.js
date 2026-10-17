@@ -3,8 +3,12 @@ export class KitchenEnvironment {
  tick(dt,players=[]){
   const before=this.time;this.time+=dt;
   if(this.stage.belt){
-   const cycle=Math.floor(this.time/6),slots=this.stations.filter(s=>s.belt).sort((a,b)=>a.x-b.x);
-   while(this.beltCycle<cycle){this.beltCycle++;if(slots.length){const items=slots.map(s=>this.kitchen.counters[s.id]);for(let i=0;i<slots.length;i++){this.direction=this.stage.reverse&&Math.floor(this.beltCycle*6/18)%2?-1:1;const incoming=items[(i+slots.length-this.direction)%slots.length];if(incoming)this.kitchen.counters[slots[i].id]=incoming;else delete this.kitchen.counters[slots[i].id];}this.events.push('belt');}}
+   const cycle=Math.floor(this.time/6),slots=this.stations.filter(s=>s.belt).sort((a,b)=>(a.beltIndex??a.x)-(b.beltIndex??b.x));
+   while(this.beltCycle<cycle){this.beltCycle++;if(slots.length){const items=slots.map(s=>this.kitchen.counters[s.id]);this.direction=this.stage.reverse&&Math.floor(this.beltCycle*6/18)%2?-1:1;
+   const exit=this.direction>0?slots.length-1:0,out=items[exit];
+   if(out?.kind==='meal'&&this.deliver?.(out)){items[exit]=undefined;delete this.kitchen.claims?.[slots[exit].id];this.events.push('belt-serve');}
+   const claims=slots.map(s=>this.kitchen.claims?.[s.id]);
+   for(let i=0;i<slots.length;i++){const incoming=items[(i+slots.length-this.direction)%slots.length];if(incoming)this.kitchen.counters[slots[i].id]=incoming;else delete this.kitchen.counters[slots[i].id];if(this.kitchen.claims){const claim=claims[(i+slots.length-this.direction)%slots.length];if(claim)this.kitchen.claims[slots[i].id]=claim;else delete this.kitchen.claims[slots[i].id];}}this.events.push('belt');}}
   }
   this.warning=false;
   for(const gate of this.stations.filter(s=>s.dynamic&&s.id.startsWith('gate'))){
