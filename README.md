@@ -80,3 +80,10 @@ Buffet có khách đi từ lối vào tới ghế, ngồi rồi mới gọi món
 Băng chuyền dùng khung extrude 3D, gỗ/kim loại phản sáng, thành bo góc, chân đỡ và con lăn. Mắt xích nổi chuyển động dùng instancing để giảm draw call. Không dùng tấm màu phẳng ghép làm thân vòng.
 
 Phục vụ tận bàn được thưởng thêm 25% trên tổng giá món, tip và combo (sau thưởng giờ cao điểm nếu có). Băng chuyền giữ giá chuẩn. Bàn khớp món hiển thị Tận bàn +25%; hiệu ứng tiền xuất hiện ngay tại bàn được phục vụ. Hai cách dùng cùng đơn, nên không thể nhận tiền cả hai lần.
+
+### Guided onboarding and languages
+
+- Driver.js provides an 11-step tour from **Cách chơi / How to play** and the opening card. A first local shift opens it automatically once per browser. Closing or completing the guide restores the previous game / menu state.
+- The tour points to the actual ingredient crate, board, pot, assembly counter, serving point and sink for the selected stage. Buffet guidance explains direct service +25% versus base-price belt service.
+- Desktop and touch instructions differ. Local simulation pauses; online rooms continue while the touring player’s input is suppressed.
+- Header language selector: Vietnamese, English, Japanese and Korean. Selection persists as `kr-language`; it changes UI text and the guide without altering recipe IDs, progress, scores or network data. UI updates localize as they are rendered, including orders, guest feedback, bot tasks, recipe book and rooms.
