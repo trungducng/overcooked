@@ -1,3 +1,4 @@
+import {fireTask} from './fire-safety.js';
 import { chefKey, RECIPES, INGREDIENTS, matchAssembly, matchRecipe } from './engine.js';
 import {moveChef, recoverChef} from './movement.js';
 import { createNavigator, nearestStation, speedMultiplier } from './navigation.js';
@@ -10,8 +11,9 @@ export class ChefBot{
     return (this.others||[]).some(h=>h.active!==false&&!h.bot&&Math.hypot(h.x-s.x,h.z-s.z)<1.85&&nearestStation(h,this.stations)?.id===s.id);
   }
   choose(game,p){
+    const safety=fireTask(game,p,this.stations);if(safety)return safety;
     const proposed=this.plan(game,p);if(!this.reserved(game,p,proposed.station))return proposed;
-    if(p.item){const free=this.stations.find(s=>s.kind==='counter'&&!game.counters[s.id]&&!this.reserved(game,p,s));return {station:free||this.stations.find(s=>s.kind==='trash'),label:'Cất đồ dự phòng · nhường quầy cho đầu bếp khác'};}
+    if(p.item){const free=this.stations.find(s=>s.kind==='counter'&&!s.belt&&!game.counters[s.id]&&!this.reserved(game,p,s));return {station:free||this.stations.find(s=>s.kind==='trash'),label:'Cất đồ dự phòng · nhường quầy cho đầu bếp khác'};}
     const sink=this.stations.find(s=>s.kind==='sink');if(game.dirty&&!(this.others||[]).some(h=>h.active!==false&&h.work&&nearestStation(h,this.stations)?.id===sink?.id))return {station:sink,work:true,label:'Rửa đĩa · nhường món bạn đang làm'};
     return {station:null,label:'Nhường đồ đang làm · chờ việc trống'};
   }
@@ -32,11 +34,11 @@ export class ChefBot{
     if(!this.recipe)this.recipe=candidates[0];if(!this.recipe)return {station:null,label:'Chờ khách ngồi và gọi món'};
     const fire=this.stations.find(s=>game.fires?.[s.id]);if(fire){if(p.item)return{station:own('trash'),label:'Dọn tay cứu bếp'};return{station:fire,work:true,label:'Dập lửa quầy bếp'}};
     if(!p.item){const stale=this.stations.find(s=>s.belt&&game.counters[s.id]?.kind==='meal'&&(game.counters[s.id].deliveryTeam??0)===(p.team??0)&&!game.orders.some(o=>o.recipe===game.counters[s.id].recipe)&&!this.reserved(game,p,s));if(stale)return {station:stale,label:'Thu món hết đơn · trả đĩa về bồn rửa'};}
-    const park=()=>({station:this.stations.find(s=>s.kind==='counter'&&!game.counters[s.id])||own('trash'),label:'Đặt đồ tạm để nhường quầy'});
+    const park=()=>({station:this.stations.find(s=>s.kind==='counter'&&!s.belt&&!game.counters[s.id])||own('trash'),label:'Đặt đồ tạm để nhường quầy'});
     const source=ingredient=>({station:this.stations.find(s=>s.kind==='counter'&&game.counters[s.id]?.ingredient===ingredient&&!this.reserved(game,p,s))||this.stations.find(s=>s.ingredient===ingredient),label:`Lấy ${INGREDIENTS[ingredient].name.toLowerCase()}`});
     for(const kind of ['pot','grill'])if(game[kind].burnt){if(p.item)return task(p.item.kind==='plate'?'sink':'trash',false,'Dọn tay để dập lửa');return task(kind,true,'Dập lửa');}
     if(p.item?.kind==='meal'&&game.customerService){const order=game.orders.find(o=>o.recipe===p.item.recipe);return order?{station:this.stations.find(s=>s.customerId===order.seatId),label:`Mang món tới Bàn ${order.seatId+1}`}:{station:own('trash'),label:'Dọn món khách không còn chờ'};}
-    if(p.item?.kind==='meal'){const belt=this.stations.find(s=>s.belt&&!game.counters[s.id]);return game.orders.some(o=>o.recipe===p.item.recipe)?{station:this.map.sushi&&belt?belt:own('serve'),label:this.map.sushi?'Đặt sushi lên băng chuyền phục vụ':'Giao món'}:task('trash',false,'Dọn món không còn đơn');}
+    if(p.item?.kind==='meal'){const belt=this.stations.filter(s=>s.belt&&!game.counters[s.id]).sort((a,b)=>((this.stations.filter(s=>s.belt).length-1-a.beltIndex)*(game.config.beltInterval||6)+Math.hypot(a.x-p.x,a.z-p.z)/this.settings.speed)-((this.stations.filter(s=>s.belt).length-1-b.beltIndex)*(game.config.beltInterval||6)+Math.hypot(b.x-p.x,b.z-p.z)/this.settings.speed)).find(s=>nearestStation(p,this.stations)?.id===s.id||this.navigator.pathTo(p,s,this.others||[]));return game.orders.some(o=>o.recipe===p.item.recipe)?{station:this.map.sushi&&belt?belt:own('serve'),label:this.map.sushi?'Đặt sushi lên băng chuyền phục vụ':'Giao món'}:task('trash',false,'Dọn món không còn đơn');}
     if(p.item?.kind==='plate'&&this.recipe.family!=='soup'&&game.assembly)return p.item.components?.length?park():task('sink',false,'Trả đĩa để tiếp tục món đang ráp');
     if(p.item?.kind==='plate')return task(this.recipe.family==='soup'?'pot':'assembly',false,this.recipe.family==='soup'?'Múc súp':'Đặt đĩa lên bàn ráp');
     if(p.item?.kind==='raw'&&p.item.ingredient==='rice')return game.pot.ingredients.length?park():task('pot',false,'Nấu cơm cho sushi');
@@ -64,14 +66,14 @@ export class ChefBot{
     p.bot=true;this.others=others;p.moving=false;p.work=false;if(game.status!=='playing')return;
     if(this.stations.some(s=>s.dynamic)||this.map.moving){this.navRefresh=(this.navRefresh||0)-dt;if(this.navRefresh<=0){this.navigator=createNavigator(this.stations);this.path=[];this.navRefresh=.75}}
     recoverChef(p,this.stations,others);this.repathWait=Math.max(0,(this.repathWait||0)-dt);
-    this.wait=Math.max(0,this.wait-dt);const task=this.choose(game,p);this.label=task.label;if(!task.station)return;
+    this.wait=Math.max(0,this.wait-dt);this.decisionWait=(this.decisionWait||0)-dt;if(!this.decision||this.decisionWait<=0||others.some(other=>other.bot)){this.decision=this.choose(game,p);this.decisionWait=.15;}const task=this.decision;this.label=task.label;if(!task.station)return;
     if(nearestStation(p,this.stations)?.id===task.station.id&&Math.hypot(p.x-task.station.x,p.z-task.station.z)<1.55){
       this.targetId=null;this.path=[];p.dir=Math.atan2(task.station.x-p.x,task.station.z-p.z);
-      if(task.work){p.work=game.work(p,task.station,dt);return;}
+      if(task.work){p.work=game.work(p,task.station,dt);if(!p.work)this.decision=null;return;}
       if(task.station.kind==='pot'&&game.pot.ingredients[0]==='rice'&&!game.pot.ready)return;
       if(task.station.kind==='pot'&&p.item?.kind==='plate'&&!game.pot.ready)return;
       if(task.station.kind==='grill'&&!p.item&&game.grill.item&&!game.grill.ready)return;
-      if(this.wait===0){const discardedMeal=task.station.kind==='trash'&&p.item?.kind==='meal';if(game.action(p,task.station)&&discardedMeal)this.recipe=null;this.wait=this.settings.delay;}return;
+      if(this.wait===0){const discardedMeal=task.station.kind==='trash'&&p.item?.kind==='meal';if(game.action(p,task.station)){if(discardedMeal)this.recipe=null;this.decision=null;}this.wait=this.settings.delay;}return;
     }
     if(this.targetId!==task.station.id||!this.path.length){this.targetId=task.station.id;if(this.repathWait>0)return;this.path=this.navigator.pathTo(p,task.station,others)||[];this.repathWait=.3;if(!this.path.length){this.label='Chờ lối trống';return;}}
     let distance=this.settings.speed*speedMultiplier(p,this.map)*dt;

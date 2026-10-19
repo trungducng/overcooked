@@ -281,8 +281,8 @@ Hơi nước sắp phun: tránh vùng cam trên sàn!|Steam incoming: avoid oran
 Cháy lan sang quầy bên cạnh! Tay không giữ Space để cứu bếp.|Fire is spreading! Empty hands + hold Space to extinguish.|延焼中！手ぶらでSpace長押しで消火。|불이 번져요! 빈손으로 Space를 길게 눌러 진화하세요.
 Cửa chắn đóng sau 2 giây. Chọn lối vòng!|Gate closes in 2 seconds. Take a detour!|2秒後にゲート閉鎖。迂回しよう！|2초 후 문이 닫혀요. 돌아가세요!
 Kéo cần trái · chạm Lấy/Đặt · giữ nút dao để thao tác|Drag left stick · tap Pick up / Put down · hold knife to work|左スティック移動・取る/置く・ナイフ長押しで作業|왼쪽 스틱 이동 · 집기/놓기 탭 · 칼 길게 눌러 작업
-W A S D di chuyển · E tương tác|W A S D move · E interact|W A S Dで移動・Eで操作|W A S D 이동 · E 상호작용
-WASD di chuyển · E lấy / đặt · giữ Space để thao tác · Shift để lướt|WASD move · E pick up / put down · hold Space to work · Shift dash|WASD移動・E取る/置く・Space長押しで作業・Shiftダッシュ|WASD 이동 · E 집기/놓기 · Space 길게 작업 · Shift 대시
+↑ ↓ ← → di chuyển · E tương tác|↑ ↓ ← → move · E interact|↑ ↓ ← →で移動・Eで操作|↑ ↓ ← → 이동 · E 상호작용
+↑ ↓ ← → di chuyển · E lấy / đặt · giữ Space để thao tác · Shift để lướt|↑ ↓ ← → move · E pick up / put down · hold Space to work · Shift dash|↑ ↓ ← →移動・E取る/置く・Space長押しで作業・Shiftダッシュ|↑ ↓ ← → 이동 · E 집기/놓기 · Space 길게 작업 · Shift 대시
 Futomaki cá và dưa|Salmon cucumber futomaki|サーモンとキュウリの太巻き|연어 오이 후토마키
 Nấu cơm → thái cá và dưa → cuộn rong biển|Cook rice → chop fish and cucumber → roll in nori|炊飯 → 魚とキュウリを切る → 海苔で巻く|밥 짓기 → 생선과 오이 썰기 → 김으로 말기
 Giờ cao điểm! Giao món nhận thêm 25% điểm trong 12 giây.|Rush hour! Serving earns +25% for 12 seconds.|ラッシュ！12秒間、配膳で25%追加。|러시 아워! 12초간 서빙 점수 25% 추가.
@@ -436,7 +436,7 @@ Kết nối trực tiếp qua PeerJS/WebRTC. Một số mạng chặn kết nố
 Phòng online|Online room|オンラインルーム|온라인 방
 PvP 2 người|PvP · 2 players|対戦・2人|대전 · 2인
 Đồng đội 4 người|Co-op · 4 players|協力・4人|협동 · 4인
-Gửi mã này cho bạn bè. Mọi người mở game, chọn Chơi online → Nhập mã. Chủ phòng điều khiển P1; khách dùng WASD · E · Space · Shift · Q · F.|Share this code with friends. Open the game, choose Play online and enter the code. The host is P1; guests use WASD · E · Space · Shift · Q · F.|コードを友達へ。ゲームのオンラインから入力。ホストはP1、ゲストはWASD・E・Space・Shift・Q・Fで操作。|친구에게 코드를 알려주세요. 온라인 플레이에서 코드를 입력하세요. 방장은 P1, 게스트는 WASD · E · Space · Shift · Q · F를 사용합니다.
+Gửi mã này cho bạn bè. Mọi người mở game, chọn Chơi online → Nhập mã. Chủ phòng điều khiển P1; khách dùng ↑ ↓ ← → · E · Space · Shift · Q · F.|Share this code with friends. Open the game, choose Play online and enter the code. The host is P1; guests use ↑ ↓ ← → · E · Space · Shift · Q · F.|コードを友達へ。ゲームのオンラインから入力。ホストはP1、ゲストは↑ ↓ ← →・E・Space・Shift・Q・Fで操作。|친구에게 코드를 알려주세요. 온라인 플레이에서 코드를 입력하세요. 방장은 P1, 게스트는 ↑ ↓ ← → · E · Space · Shift · Q · F를 사용합니다.
 Giữ tab chủ phòng mở. Khách mất mạng có thể dùng Vào lại để giữ nguyên chỗ và đồ.|Keep the host tab open. Disconnected guests can Rejoin to keep their seat and items.|ホストのタブを開いたままにしてください。切断したゲストは再参加で席と持ち物を維持できます。|방장 탭을 열어 두세요. 연결이 끊긴 게스트는 재참여로 자리와 물건을 유지할 수 있어요.
 mất kết nối. Đang giữ đồ và chỗ cho người chơi vào lại.|disconnected. Keeping items and seat for reconnection.|切断。再接続のため席と持ち物を確保中。|연결 끊김. 재접속을 위해 자리와 물건 보관 중.
 Cảm ứng: cần trái di chuyển · Lấy/Đặt · giữ nút dao thao tác. Local nhiều người cần bàn phím/tay cầm; điện thoại/iPad dùng Online để mỗi người có điều khiển riêng.|Touch: left stick to move · Pick up / Put down · hold knife to work. Local multiplayer needs keyboards / controllers; use Online for separate phone / iPad controls.|タッチ：左スティックで移動・取る/置く・ナイフ長押し。ローカル対戦にはキーボードやパッドが必要。スマホ・iPadはオンラインで各自操作。|터치: 왼쪽 스틱 이동 · 집기/놓기 · 칼 길게 작업. 로컬 다인 플레이는 키보드/컨트롤러가 필요하며 휴대폰/iPad는 온라인으로 개별 조작하세요.
@@ -488,4 +488,41 @@ Phòng|Room|ルーム|방
 đang chờ bạn bè|waiting for friends|友達を待っています|친구 대기 중
 Bạn là|You are|あなたは|내 자리
 Đóng hướng dẫn|Close guide|ガイドを閉じる|가이드 닫기
+`);
+addTranslations(`
+Bình cứu hoả|Fire extinguisher|消火器|소화기
+Lấy / trả bình cứu hoả|Take / return extinguisher|消火器を取る / 戻す|소화기 집기 / 반납
+Giữ để phun dập lửa|Hold to spray extinguisher|長押しで消火剤を噴射|길게 눌러 소화기 분사
+Cần bình cứu hoả để dập lửa|An extinguisher is required|消火器が必要です|소화기가 필요해요
+Nồi cháy · dùng bình cứu hoả|Pot burning · use extinguisher|鍋が燃焼中・消火器を使用|냄비 화재 · 소화기 사용
+Chảo cháy · dùng bình cứu hoả|Grill burning · use extinguisher|グリルが燃焼中・消火器を使用|그릴 화재 · 소화기 사용
+Cháy! Lấy bình cứu hoả rồi giữ Space để dập lửa.|Fire! Take an extinguisher, then hold Space.|火事！消火器を取り、Spaceを長押し。|화재! 소화기를 집고 Space를 길게 누르세요.
+Quầy đang cháy! Cầm bình cứu hoả và giữ thao tác.|Counter burning! Hold an extinguisher and hold Work.|台が燃焼中！消火器を持って作業を長押し。|조리대 화재! 소화기를 들고 작업을 길게 누르세요.
+Cầm bình cứu hoả, giữ Space cạnh đám cháy để phun.|Hold Space near fire while carrying an extinguisher.|消火器を持ち、火のそばでSpaceを長押し。|소화기를 들고 불 옆에서 Space를 길게 누르세요.
+Kệ bình cứu hoả: E lấy / trả bình.|Extinguisher rack: E to take / return.|消火器棚：Eで取る / 戻す。|소화기 선반: E로 집기 / 반납.
+Đã dập lửa bằng bình cứu hoả!|Fire extinguished!|消火完了！|소화기로 진화 완료!
+Không bỏ bình cứu hoả vào thùng rác. Trả về kệ hoặc đặt lên bàn.|Do not bin the extinguisher. Return it or park it on a counter.|消火器は捨てられません。棚か台に戻してください。|소화기는 버릴 수 없어요. 선반이나 조리대에 놓으세요.
+Dùng bình cứu hoả dập lửa|Using extinguisher|消火器で消火中|소화기로 진화 중
+Trả bình cứu hoả|Returning extinguisher|消火器を返却|소화기 반납
+Đặt đồ xuống để lấy bình cứu hoả|Putting item down to get extinguisher|消火器を取るため物を置く|소화기를 집기 위해 물건 놓기
+Lấy bình cứu hoả|Collecting extinguisher|消火器を取る|소화기 집기
+Chờ bình cứu hoả · nhường đường|Waiting for extinguisher · giving way|消火器を待つ・道を譲る|소화기 대기 · 길 양보
+Cháy lan! Lấy bình cứu hoả rồi giữ Space để cứu bếp.|Fire spreading! Take an extinguisher, then hold Space.|延焼中！消火器を取ってSpace長押し。|불이 번져요! 소화기를 집고 Space를 길게 누르세요.
+Bàn ráp đã có đĩa. Thêm nguyên liệu trực tiếp, hoặc E tay không lấy đĩa cũ ra.|There is already a plate here. Add ingredients directly, or E with empty hands to remove it.|すでに皿があります。具材を直接加えるか、手ぶらでEで取り出してください。|이미 접시가 있어요. 재료를 바로 넣거나 빈손으로 E를 눌러 꺼내세요.
+Bàn ráp chưa có đĩa sạch. Đặt đĩa lên trước, rồi thêm nguyên liệu.|Place a clean plate first, then add ingredients.|先にきれいな皿を置いてから食材を加えてください。|먼저 깨끗한 접시를 놓고 재료를 추가하세요.
+Nguyên liệu chưa khớp đĩa đang ráp. Sushi cần cơm chín, cá / dưa đã thái, rong biển sống; kiểm tra các phần đã có trên đĩa.|Ingredient does not fit this plate. Sushi needs cooked rice, chopped fish / cucumber and raw nori. Check what is already on the plate.|この皿に合わない具材です。寿司は炊いた米、切った魚・キュウリ、海苔。皿の内容を確認してください。|접시와 맞지 않는 재료예요. 초밥은 익힌 밥, 썬 생선/오이, 생김이 필요해요. 이미 담긴 재료를 확인하세요.
+Giao đơn đầu danh sách để tăng combo. Khi cháy, lấy bình cứu hoả ở kệ đỏ và giữ Space để phun.|Serve the first order for combos. For fires, take an extinguisher from a red rack and hold Space.|先頭の注文でコンボ。火事は赤い棚の消火器を取り、Space長押し。|첫 주문으로 콤보. 화재 시 빨간 선반의 소화기를 집고 Space를 길게 누르세요.
+`);
+addTranslations(`
+Nguyên bản|Original|オリジナル|기본
+Giáng sinh|Christmas|クリスマス|크리스마스
+Tết|Lunar New Year|旧正月|설날
+Phong cách căn bếp|Kitchen themes|キッチンテーマ|주방 테마
+Theme và nhạc nền đi cùng nhau|Each theme has its own soundtrack|テーマごとに専用BGM|테마마다 전용 배경음악
+Đổi theme căn bếp|Change kitchen theme|テーマ変更|주방 테마 변경
+Giữ phong cách riêng của từng căn bếp.|Each kitchen’s original style.|各キッチン本来のスタイル。|각 주방의 기본 스타일.
+Bí ngô, nến tím và khu vườn ma quái.|Pumpkins, violet candles and a haunted garden.|カボチャ、紫の灯り、不気味な庭。|호박, 보랏빛 촛불, 유령 정원.
+Cây thông, quà tặng và tuyết rơi nhẹ.|Christmas trees, presents and gentle snow.|ツリー、プレゼント、静かな雪。|크리스마스트리, 선물, 잔잔한 눈.
+Đèn lồng đỏ, hoa mai, hoa đào và sắc vàng.|Red lanterns, apricot and peach blossoms, golden accents.|赤い提灯、梅と桃の花、金色の装飾。|붉은 등불, 매화와 복숭아꽃, 황금빛 장식.
+Bật/tắt nhạc nền|Toggle background music|BGM切替|배경음악 켜기/끄기
 `);

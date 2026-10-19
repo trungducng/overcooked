@@ -20,8 +20,8 @@ npm run build
 
 | Chef | Đi | Lấy/đặt/đưa/nhặt | Giữ thao tác | Lướt | Thả | Ném |
 |---|---|---|---|---|---|---|
-| P1 | WASD | E | Space | Shift trái | Q | F |
-| P2 | Mũi tên | Enter | / | Shift phải | Delete | . |
+| P1 | ↑ ↓ ← → | E | Space | Shift trái | Q | F |
+| P2 | WASD | Enter | / | Shift phải | Delete | . |
 | P3 | IJKL | O | U | P | N | M |
 | P4 | Num 8456 | + | Num 0 | Num decimal | Num − | Num × |
 
@@ -87,3 +87,21 @@ Phục vụ tận bàn được thưởng thêm 25% trên tổng giá món, tip 
 - The tour points to the actual ingredient crate, board, pot, assembly counter, serving point and sink for the selected stage. Buffet guidance explains direct service +25% versus base-price belt service.
 - Desktop and touch instructions differ. Local simulation pauses; online rooms continue while the touring player’s input is suppressed.
 - Header language selector: Vietnamese, English, Japanese and Korean. Selection persists as `kr-language`; it changes UI text and the guide without altering recipe IDs, progress, scores or network data. UI updates localize as they are rendered, including orders, guest feedback, bot tasks, recipe book and rooms.
+
+Desktop uses arrow keys for P1 and WASD for P2. Online participants each use the P1 arrow-key layout. Narrow desktop windows keep keyboard instructions; touch UI follows touch hardware or the explicit toggle.
+
+### Fire safety and sushi fixes
+
+- Two finite shared extinguishers per kitchen. E takes/returns the red rack tool; hold Space (touch: hold Work) beside a burning station to spray. Empty hands cannot extinguish. The tool can be handed off, parked or dropped, but cannot be thrown or discarded.
+- Extinguishing takes 1.1 seconds; only unattended cookware can spread once per 20 seconds, with at most three fires. Counters cannot start cascading fires and racks cannot catch fire. Bots retrieve and return equipment.
+- Shader flames replace stretched orange blobs; pooled smoke and white extinguisher foam show fires and suppression.
+- Sushi has a dedicated prep counter. Bots park unfinished items off the belt, choose reachable serving slots, and prefer a short remaining belt journey. E at a station operates it before trying to hand an item to a nearby chef. Assembly explains existing/missing plates and incompatible preparation.
+
+### Seasonal kitchens and music
+
+- Use **Chọn trận đấu → Phong cách căn bếp** (or the theme button) for Original, Halloween, Christmas and Tết. Themes apply to all ten authored layouts and persist locally as `kr-season`. They change decoration, lighting and floor palette without changing collision or unlock progress.
+- Seasonal decoration is batched by material and adds no lights/shadow maps. Snow / petals use one points draw call, with 48 particles in Balanced, 96 in High and none in Low.
+- The ♬ button controls music independently of sound effects, remembers `kr-music`, and starts after a pointer/keyboard gesture. Playback stops while the page is hidden, and theme changes cancel previous voices/scheduling.
+- Christmas plays a synthesized **monophonic Jingle Bells chorus** with held-note rhythm, no bass or harmony, based on James Lord Pierpont’s 1857 public-domain composition: https://www.loc.gov/item/2023812429/. Other themes use original motifs. No modern recording is bundled; the requested “Mùa xuân ơi” is not included.
+- Station geometry batches across the whole kitchen while preserving moving carts, gates, cookware and contents. HUD and guest bubbles update only when source content changes, including across language switches. Single-bot decisions run at a reduced cadence; multi-bot shared kitchens retain immediate reservation checks.
+- Local QA: first kitchen at Balanced used 164 draw calls versus 301 before this pass (~45% less), maintaining 60 FPS on the test machine. Seasonal variants added 13–16 draw calls. This is a measured local result, not a guarantee for every device.

@@ -148,5 +148,5 @@ export function createPresentation(scene,renderer,camera){
  let lightCount=0;environment.traverse(o=>{if(o.isPointLight){o.visible=lightCount++<2;}});
  function resize(){}
  function update(time){mistMaterial.uniforms.time.value=time;for(const p of portals)p.uniforms.time.value=time;for(const fire of fires){const flicker=1+Math.sin(time*9+fire.phase)*.12+Math.sin(time*17+fire.phase)*.05;fire.flame.scale.set(1,flicker,1);fire.light.intensity=30*flicker;fire.f.rotation.z=Math.sin(time*7+fire.phase)*.12;}dust.rotation.y=Math.sin(time*.035)*.04;}
- return {materials,setTheme,resize,update,render:()=>renderer.render(scene,camera)};
+ return {materials,setSeasonPalette(id,stage){tiles.material.color.set(id==='halloween'?0xa98bba:id==='christmas'?0xd4eeee:id==='tet'?0xead09a:stage?.style.floor??0xc4c8d5);stone.color.set(id==='halloween'?0x70607f:id==='christmas'?0x718d9b:id==='tet'?0x947364:0x69718d);},setTheme,resize,update,render:()=>renderer.render(scene,camera)};
 }

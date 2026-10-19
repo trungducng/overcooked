@@ -19,6 +19,7 @@ export class KitchenMatch {
     this.games=Array.from({length:this.competitive?2:1},()=>new KitchenGame(config));
     this.kitchen=Object.fromEntries(['board','pot','grill','assembly','plates','dirty','wash','counters','fires','claims'].map(key=>[key,this.games[0][key]]));
     for(const game of this.games)game.attachKitchen(this.kitchen);
+    for(const s of this.stations.filter(s=>s.kind==='extinguisher'))this.kitchen.counters[s.id]={kind:'extinguisher'};
     if(this.level.buffet){this.customers=new CustomerService(this.level,this.stations);for(const seat of DINING_SEATS){const id=DINING_SEATS.indexOf(seat),belt=this.stations.find(s=>s.beltIndex===seat.beltIndex);this.stations.push({id:'customer'+id,kind:'customer',customerId:id,customerActive:false,x:belt.x,z:belt.z});}this.customers.bind(this.games);}
     this.environment=new KitchenEnvironment(this.level,this.stations,this.kitchen,this.map);
     this.environment.deliver=(item,station)=>{const g=this.games[this.competitive?(item.deliveryTeam===1?1:0):0];if(this.customers)return this.customers.belt(g,item,station);if(!g.orders.some(o=>o.recipe===item.recipe))return false;return g.action({item,team:item.deliveryTeam??0,bot:true},this.stations.find(s=>s.kind==='serve'));};

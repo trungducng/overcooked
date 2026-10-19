@@ -22,6 +22,9 @@ export class KitchenEffects {
   if(k.grill.ready&&!prev.grill){const s=at('grill');this.ring(s.x,s.z,0xa5ed93,1.45)}prev.grill=k.grill.ready;
   const burnt=k.pot.burnt||k.grill.burnt;if(burnt&&!prev.burnt){const s=at(k.pot.burnt?'pot':'grill');this.burst(s.x,1.6,s.z,0xff763a,22,2,1);this.ring(s.x,s.z,0xff573b)}prev.burnt=burnt;
   if(playing&&this.beat<=0){
+   for(const s of match.stations)if(k.fires[s.id])this.burst(s.x,2.3,s.z,0x756b66,1,.28,1.5,.14);
+   for(const p of players)if(p.active&&p.work&&p.item?.kind==='extinguisher'){const dx=Math.sin(p.dir),dz=Math.cos(p.dir);for(let i=1;i<5;i++)this.burst(p.x+dx*i*.35,1.3,p.z+dz*i*.35,0xe9f9ff,low?1:2,.3,.4,.10);}
+
    this.beat=low?.22:.12;
    if((k.board?.progress||0)>prev.board){const s=at('board');this.burst(s.x,1.5,s.z,INGREDIENTS[k.board.ingredient].color,low?2:4,.8,.4,.045)}
    if(k.wash>prev.wash){const s=at('sink');this.burst(s.x,1.5,s.z,0xb7eeff,3,.55,.7,.06)}

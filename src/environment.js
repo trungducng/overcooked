@@ -22,13 +22,16 @@ export class KitchenEnvironment {
   }
   for(const vent of this.vents){const phase=(this.time+vent.offset)%14,was=vent.warning;vent.warning=phase>=4&&phase<6;vent.active=phase>=6&&phase<10;if(vent.warning&&!was)this.events.push('steam-warning');}
   if(this.map)this.map.dynamicHazards=this.vents.filter(v=>v.active).map(v=>({...v,multiplier:.35}));
-  // Burning cookware ignites a neighbour after eight seconds. Extinguishing
-  // individual counters is always possible with empty hands, including the sink.
-  const hot=this.stations.filter(s=>(s.kind==='pot'||s.kind==='grill')&&this.kitchen[s.kind].burnt||this.kitchen.fires?.[s.id]);
-  const current=new Set(hot.map(s=>s.id));for(const id of Object.keys(this.spread))if(!current.has(id))delete this.spread[id];
-  for(const source of hot){this.spread[source.id]=(this.spread[source.id]||0)+dt;if(this.spread[source.id]<8)continue;this.spread[source.id]=0;
-   const next=this.stations.filter(s=>s!==source&&!['obstacle','trash','pot','grill'].includes(s.kind)&&!this.kitchen.fires[s.id]&&Math.hypot(s.x-source.x,s.z-source.z)<3.25).sort((a,b)=>Math.hypot(a.x-source.x,a.z-source.z)-Math.hypot(b.x-source.x,b.z-source.z))[0];
-   if(next){this.kitchen.fires[next.id]={work:0};this.events.push('spread');}
+  // No chain reaction: only unattended cookware spreads, globally once per 20s.
+  // At most three burning stations, and an actively suppressed source cannot spread.
+  const hot=this.stations.filter(s=>['pot','grill'].includes(s.kind)&&this.kitchen[s.kind].burnt);
+  const count=hot.length+Object.keys(this.kitchen.fires).length;
+  this.spreadCooldown=Math.max(0,(this.spreadCooldown??20)-dt);
+  if(!hot.length)this.spreadCooldown=20;
+  if(this.spreadCooldown===0&&count<3){
+   const source=hot.find(s=>!this.kitchen[s.kind].fireWork);
+   const next=source&&this.stations.filter(s=>s!==source&&!['obstacle','trash','pot','grill','extinguisher','customer'].includes(s.kind)&&!s.belt&&!this.kitchen.fires[s.id]&&Math.hypot(s.x-source.x,s.z-source.z)<3.25).sort((a,b)=>Math.hypot(a.x-source.x,a.z-source.z)-Math.hypot(b.x-source.x,b.z-source.z))[0];
+   if(next){this.kitchen.fires[next.id]={work:0};this.events.push('spread');}this.spreadCooldown=20;
   }
   if(this.stage.moving){
    const counter=this.stations.find(s=>s.id==='counter1'),target=Math.sin(this.time*Math.PI/12)*2.4,dx=target-counter.x;

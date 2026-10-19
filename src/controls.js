@@ -1,6 +1,6 @@
 export const CONTROLS=[
- {up:'KeyW',left:'KeyA',down:'KeyS',right:'KeyD',interact:'KeyE',work:'Space',dash:'ShiftLeft',drop:'KeyQ',throw:'KeyF',label:'WASD · E · Space · Shift · Q · F'},
- {up:'ArrowUp',left:'ArrowLeft',down:'ArrowDown',right:'ArrowRight',interact:'Enter',work:'Slash',dash:'ShiftRight',drop:'Delete',throw:'Period',label:'↑↓←→ · Enter · / · Shift phải · Delete · .'},
+ {up:'ArrowUp',left:'ArrowLeft',down:'ArrowDown',right:'ArrowRight',interact:'KeyE',work:'Space',dash:'ShiftLeft',drop:'KeyQ',throw:'KeyF',label:'↑↓←→ · E · Space · Shift · Q · F'},
+ {up:'KeyW',left:'KeyA',down:'KeyS',right:'KeyD',interact:'Enter',work:'Slash',dash:'ShiftRight',drop:'Delete',throw:'Period',label:'WASD · Enter · / · Shift phải · Delete · .'},
  {up:'KeyI',left:'KeyJ',down:'KeyK',right:'KeyL',interact:'KeyO',work:'KeyU',dash:'KeyP',drop:'KeyN',throw:'KeyM',label:'IJKL · O · U · P · N · M'},
  {up:'Numpad8',left:'Numpad4',down:'Numpad5',right:'Numpad6',interact:'NumpadAdd',work:'Numpad0',dash:'NumpadDecimal',drop:'NumpadSubtract',throw:'NumpadMultiply',label:'Num 8456 · + · 0 · dấu chấm · − · ×'},
 ];

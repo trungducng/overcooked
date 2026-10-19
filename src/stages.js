@@ -61,14 +61,17 @@ export function stageStations(stage,competitive=false){
   const loop=stations.filter(s=>s.belt).sort((a,b)=>a.x-b.x);loop.forEach((s,i)=>s.beltIndex=i);
   for(const [i,x] of [2.8,0,-2.8].entries())stations.push({id:'belt'+(i+3),kind:'counter',x,z:1.8,belt:true,beltIndex:i+3});
  }
+ if(stage.sushi&&!stage.buffet)stations.push({id:'sushi-prep',kind:'counter',x:-2.8,z:4.2});
  if(stage.buffet){
   for(let i=stations.length-1;i>=0;i--)if(stations[i].belt||stations[i].dynamic||stations[i].kind==='obstacle')stations.splice(i,1);
   layout({tomato:[-5.6,-2.2],onion:[-2.8,-2.2],mushroom:[0,-2.2],bun:[2.8,-2.2],beef:[5.6,-2.2],sink:[-5.6,2.2],plates:[-2.8,2.2],assembly:[0,2.2],board:[2.8,2.2],grill:[5.6,2.2],pot:[0,0],lettuce:[-7.5,-3.8],trash:[7.5,-3.8],serve:[7.5,3.8]});
   for(const [id,ingredient] of Object.entries({tomato:'fish',onion:'rice',mushroom:'cucumber',bun:'nori'}))stations.find(s=>s.id===id).ingredient=ingredient;
   const ring=[[-8.4,-6.2],[-4.2,-6.2],[0,-6.2],[4.2,-6.2],[8.4,-6.2],[10.5,0],[8.4,6.2],[4.2,6.2],[0,6.2],[-4.2,6.2],[-8.4,6.2],[-10.5,0]];
   ring.forEach(([x,z],i)=>stations.push({id:'buffet-belt'+i,kind:'counter',x,z,belt:true,beltIndex:i}));
+  stations.push({id:'buffet-prep-left',kind:'counter',x:-7,z:0},{id:'buffet-prep-right',kind:'counter',x:7,z:0});
   stations.bounds={minX:-9.2,maxX:9.2,minZ:-5.1,maxZ:5.1};
  }
+ stations.push({id:'extinguisher-left',kind:'extinguisher',x:-7.2,z:-5.0,width:.65,depth:.55},{id:'extinguisher-right',kind:'extinguisher',x:7.2,z:-5.0,width:.65,depth:.55});
  return stations;
 }
 export function isStageUnlocked(stage,records,mode='solo'){

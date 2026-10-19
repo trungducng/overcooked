@@ -1,9 +1,11 @@
+import {fireTask} from './fire-safety.js';
 import {ChefBot} from './bot.js';
 import {RECIPES,matchRecipe} from './engine.js';
 import {nearestStation} from './navigation.js';
 export class CoopBot extends ChefBot {
  constructor(stations,map,difficulty,stage){super(stations,map,difficulty);this.stage=stage;this.humans=[];}
  choose(game,p){
+  const safety=fireTask(game,p,this.stage.roles?this.stations.filter(s=>s.x>0):this.stations);if(safety)return safety;
   const station=kind=>this.stations.find(s=>s.kind===kind),task=(s,work,label)=>({station:s,work,label});
   // The relay has a hard preparation/cooking division. The helper stays on the
   // cooking side and consumes only ingredients actually passed across the hatch.
